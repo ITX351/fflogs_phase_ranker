@@ -1,70 +1,55 @@
-# Getting Started with Create React App
+## FFLogsPhaseRanker
+### 在线FFLogs分P伤害排名工具
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+**访问 [https://your-deployment-url.com](https://your-deployment-url.com) 在线使用。**
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+### 使用方法
 
-### `npm start`
+1. **在网页1输入FFLogs的`logs_id`：**
+   - 示例：`https://www.fflogs.com/reports/abc123xyz`
+   - 输入`abc123xyz`作为`logs_id`。
+2. **点击确认后进入页面2：**
+   - 页面2将通过调用FFLogs的API，读取每个分P的伤害数据。
+3. **查看分P伤害排名：**
+   - 工具会计算每个分P的伤害数据占全体玩家的排名的预估，并展示结果。
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 其他事项
 
-### `npm test`
+- 需要确保输入的`logs_id`是有效的FFLogs报告ID。
+- 工具仅支持公开的FFLogs数据，无法读取私密报告。
+- 排名计算基于FFLogs API返回的数据，可能会因API限制或数据更新而有所变化。
+- 目前仅对部分常见的战斗场景进行了测试。如有任何问题或建议，欢迎反馈或fork。
+- 叠甲：所有数据仅供参考。由于实际战斗情景下，不同分P、不同职业组合的面临的实际战斗场景均不相同，受停手、资源存储、短时长的直暴率的影响导致伤害有差距。**使用该工具即代表你已知晓：其所预估的数据不能直接作为衡量玩家水平的依据。**
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+---
 
-### `npm run build`
+### 服务器 React.js 配置
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+#### Setup
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+运行以下命令以安装所有依赖项：
+```sh
+npm install
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+#### Running
 
-### `npm run eject`
+运行以下命令并访问 `localhost:3000` 进行调试：
+```sh
+npm start
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+#### Release
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+运行以下命令以生成最小化的生产版本：
+```sh
+npm run build
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+---
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+by ITX351（王离@延夏）

@@ -1,0 +1,44 @@
+[
+    {
+        "datasetName": "Eden's Promise Phase 1",
+        "creationDate": "2023-10-01",
+        "raidMatchName": "Eden's Promise",
+        "raidLogsPhase": 1,
+        "dataFileName": "eden7.1p1.csv"
+    },
+    {
+        "datasetName": "Eden's Promise Phase 2",
+        "creationDate": "2023-10-01",
+        "raidMatchName": "Eden's Promise",
+        "raidLogsPhase": 2,
+        "dataFileName": "eden7.1p2.csv"
+    },
+    {
+        "datasetName": "Eden's Promise Phase 3",
+        "creationDate": "2023-10-01",
+        "raidMatchName": "Eden's Promise",
+        "raidLogsPhase": 3,
+        "dataFileName": "eden7.1p3.csv"
+    },
+    {
+        "datasetName": "Eden's Promise Phase 4",
+        "creationDate": "2023-10-01",
+        "raidMatchName": "Eden's Promise",
+        "raidLogsPhase": 4,
+        "dataFileName": "eden7.1p4.csv"
+    },
+    {
+        "datasetName": "Eden's Promise Phase 5",
+        "creationDate": "2023-10-01",
+        "raidMatchName": "Eden's Promise",
+        "raidLogsPhase": 5,
+        "dataFileName": "eden7.1p5.csv"
+    },
+    {
+        "datasetName": "Omega Protocol Phase 3",
+        "creationDate": "2023-10-01",
+        "raidMatchName": "Omega Protocol",
+        "raidLogsPhase": 3,
+        "dataFileName": "omega7.1p3.csv"
+    }
+]
