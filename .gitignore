@@ -5,7 +5,8 @@
 /.pnp
 .pnp.js
 package-lock.json
-src/api/apiConfig.js
+*sample.json
+src/api/apiConfig.ts
 
 # testing
 /coverage
