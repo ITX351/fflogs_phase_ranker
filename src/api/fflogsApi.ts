@@ -49,8 +49,15 @@ interface DamageDoneData {
   combatTime: number;
 }
 
-async function fetchLogData(): Promise<LogData | null> {
-  const { apiKey, logsId } = apiConfig;
+async function fetchLogData(logsId: string, apiKey: string): Promise<LogData | null> {
+  if (!apiKey) {
+    apiKey = apiConfig.apiKey;
+  }
+
+  if (!logsId || !apiKey) {
+    throw new Error('缺少 logsId 或 apiKey');
+  }
+
   const fightsUrl = `https://cn.fflogs.com/v1/report/fights/${logsId}?api_key=${apiKey}`;
   console.log('Fetching log data from:', fightsUrl);
 
@@ -93,6 +100,14 @@ async function fetchLogData(): Promise<LogData | null> {
 }
 
 async function fetchDamageDoneData(logsId: string, apiKey: string, start: number, end: number): Promise<DamageDoneData | null> {
+  if (!apiKey) {
+    apiKey = apiConfig.apiKey;
+  }
+
+  if (!logsId || !apiKey) {
+    throw new Error('缺少 logsId 或 apiKey');
+  }
+
   const url = `https://cn.fflogs.com/v1/report/tables/damage-done/${logsId}?api_key=${apiKey}&start=${start}&end=${end}`;
   console.log('Fetching damage done data from:', url);
 
@@ -123,47 +138,66 @@ async function fetchDamageDoneData(logsId: string, apiKey: string, start: number
 }
 
 async function main() {
-  const logData = await fetchLogData();
-  if (logData) {
-    console.log('Log Title:', logData.title);
-    console.log('Friendlies:');
-    logData.friendlies.forEach((friendly) => {
-      console.log(`  ID: ${friendly.id}, Name: ${friendly.name}, Server: ${friendly.server}, Type: ${friendly.type}`);
-    });
+  const logsId = apiConfig.logsId || '';
+  const apiKey = ''; // 留空以测试默认值
 
-    console.log('Fights:');
-    console.log(`  Total Fights: ${logData.fights.length}`);
-    const filteredFights = apiConfig.fightIds && apiConfig.fightIds.length > 0
-      ? logData.fights.filter((fight) => apiConfig.fightIds.includes(fight.id))
-      : logData.fights;
+  if (!logsId) {
+    console.error('缺少 logsId');
+    return;
+  }
 
-    for (const fight of filteredFights) {
-      console.log(`  Fight ID: ${fight.id}, Name: ${fight.name}`);
-      console.log(`    Boss: ${fight.friendlies.length > 0 ? fight.friendlies[0].name : 'Unknown'}`);
-      console.log(`    Total Phases: ${fight.phases.length}`);
-      for (const phase of fight.phases) {
-        console.log(`    Phase: ${phase.name} (Start Time: ${phase.startTime}, End Time: ${phase.endTime})`);
-        const damageData = await fetchDamageDoneData(apiConfig.logsId, apiConfig.apiKey, phase.startTime, phase.endTime);
-        if (damageData) {
-          console.log(`      Damage Done Data: Total Time: ${damageData.totalTime}, Downtime: ${damageData.downtime}, Combat Time: ${damageData.combatTime}`);
-          console.log(`        Players:`);
-          console.log(`          Name           | Total RDPS   | Total ADPS   | Total RD    | Total AD`);
-          console.log(`          -------------- | ------------ | ------------ | ----------- | -----------`);
-          damageData.players
-            .sort((a, b) => b.totalAD - a.totalAD) // 按 totalAD 降序排序
-            .forEach((player) => {
-              console.log(`          ${player.name.padEnd(14)} | ${player.totalRDPS.toFixed(2).padEnd(12)} | ${player.totalADPS.toFixed(2).padEnd(12)} | ${player.totalRD.toFixed(2).padEnd(11)} | ${player.totalAD.toFixed(2).padEnd(11)}`);
-            });
-        } else {
-          console.log(`      Failed to fetch damage done data for phase: ${phase.name}`);
+  try {
+    const logData = await fetchLogData(logsId, apiKey);
+    if (logData) {
+      console.log('Log Title:', logData.title);
+      console.log('Friendlies:');
+      logData.friendlies.forEach((friendly) => {
+        console.log(`  ID: ${friendly.id}, Name: ${friendly.name}, Server: ${friendly.server}, Type: ${friendly.type}`);
+      });
+
+      console.log('Fights:');
+      console.log(`  Total Fights: ${logData.fights.length}`);
+      const fightIds = apiConfig.fightIds ? apiConfig.fightIds : [];
+      const filteredFights = fightIds.length > 0
+        ? logData.fights.filter((fight) => fightIds.includes(fight.id))
+        : logData.fights;
+
+      for (const fight of filteredFights) {
+        console.log(`  Fight ID: ${fight.id}, Name: ${fight.name}`);
+        console.log(`    Boss: ${fight.friendlies.length > 0 ? fight.friendlies[0].name : 'Unknown'}`);
+        console.log(`    Total Phases: ${fight.phases.length}`);
+        for (const phase of fight.phases) {
+          console.log(`    Phase: ${phase.name} (Start Time: ${phase.startTime}, End Time: ${phase.endTime})`);
+          const damageData = await fetchDamageDoneData(logsId, apiKey, phase.startTime, phase.endTime);
+          if (damageData) {
+            console.log(`      Damage Done Data: Total Time: ${damageData.totalTime}, Downtime: ${damageData.downtime}, Combat Time: ${damageData.combatTime}`);
+            console.log(`        Players:`);
+            console.log(`          Name           | Total RDPS   | Total ADPS   | Total RD    | Total AD`);
+            console.log(`          -------------- | ------------ | ------------ | ----------- | -----------`);
+            damageData.players
+              .sort((a, b) => b.totalAD - a.totalAD) // 按 totalAD 降序排序
+              .forEach((player) => {
+                console.log(`          ${player.name.padEnd(14)} | ${player.totalRDPS.toFixed(2).padEnd(12)} | ${player.totalADPS.toFixed(2).padEnd(12)} | ${player.totalRD.toFixed(2).padEnd(11)} | ${player.totalAD.toFixed(2).padEnd(11)}`);
+              });
+          } else {
+            console.log(`      Failed to fetch damage done data for phase: ${phase.name}`);
+          }
         }
       }
+    } else {
+      console.log('Failed to fetch log data.');
     }
-  } else {
-    console.log('Failed to fetch log data.');
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error('Error:', error.message);
+    } else {
+      console.error('Error:', error);
+    }
   }
 }
 
 if (require.main === module) {
   main();
 }
+
+export { fetchLogData, fetchDamageDoneData };
