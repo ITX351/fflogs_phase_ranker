@@ -1,5 +1,11 @@
 import axios from 'axios';
-import apiConfig from './apiConfig';
+// 尝试导入 apiConfig，如果不存在则使用默认值
+let apiConfig: { apiKey?: string; logsId?: string; fightIds?: number[] } = {};
+try {
+  apiConfig = require('./apiConfig').default;
+} catch {
+  console.warn('apiConfig not found, using default configuration.');
+}
 
 interface Phase {
   startTime: number;
@@ -20,6 +26,9 @@ interface Fight {
   name: string;
   phases: Phase[];
   friendlies: Friendly[];
+  kill: boolean;
+  start_time: number;
+  end_time: number;
 }
 
 interface LogData {
@@ -51,7 +60,7 @@ interface DamageDoneData {
 
 async function fetchLogData(logsId: string, apiKey: string): Promise<LogData | null> {
   if (!apiKey) {
-    apiKey = apiConfig.apiKey;
+    apiKey = apiConfig.apiKey || '';
   }
 
   if (!logsId || !apiKey) {
@@ -90,6 +99,9 @@ async function fetchLogData(logsId: string, apiKey: string): Promise<LogData | n
       friendlies: friendlies.filter((friendly) =>
         friendly.fights.some((f: { id: number }) => f.id === fight.id)
       ),
+      kill: fight.kill,
+      start_time: fight.start_time,
+      end_time: fight.end_time,
     }));
 
     return { title, fights, friendlies };
@@ -101,7 +113,7 @@ async function fetchLogData(logsId: string, apiKey: string): Promise<LogData | n
 
 async function fetchDamageDoneData(logsId: string, apiKey: string, start: number, end: number): Promise<DamageDoneData | null> {
   if (!apiKey) {
-    apiKey = apiConfig.apiKey;
+    apiKey = apiConfig.apiKey || '';
   }
 
   if (!logsId || !apiKey) {
@@ -116,20 +128,23 @@ async function fetchDamageDoneData(logsId: string, apiKey: string, start: number
     const data = response.data;
     const { totalTime, downtime = 0, combatTime } = data;
 
-    const players: PlayerDamageData[] = data.entries.map((entry: any) => ({
-      name: entry.name,
-      type: entry.type,
-      id: entry.id,
-      activeTime: entry.activeTime,
-      activeTimeReduced: entry.activeTimeReduced,
-      totalRD: entry.totalRDPS,
-      totalAD: entry.totalADPS,
-      totalND: entry.totalNDPS,
-      totalRDPS: entry.totalRDPS / (totalTime - downtime) * 1000.,
-      totalADPS: entry.totalADPS / (totalTime - downtime) * 1000.,
-      totalNDPS: entry.totalNDPS / (totalTime - downtime) * 1000.,
-    }));
-    
+    const players: PlayerDamageData[] = data.entries
+      .filter((entry: any) => entry.type !== "LimitBreak") // 去除 type 为 "LimitBreak" 的项
+      .map((entry: any) => ({
+        name: entry.name,
+        type: entry.type,
+        id: entry.id,
+        activeTime: entry.activeTime,
+        activeTimeReduced: entry.activeTimeReduced,
+        totalRD: entry.totalRDPS,
+        totalAD: entry.totalADPS,
+        totalND: entry.totalNDPS,
+        totalRDPS: entry.totalRDPS / (totalTime - downtime) * 1000.,
+        totalADPS: entry.totalADPS / (totalTime - downtime) * 1000.,
+        totalNDPS: entry.totalNDPS / (totalTime - downtime) * 1000.,
+      }))
+      .sort((a: { totalRD: number; }, b: { totalRD: number; }) => b.totalRD - a.totalRD); // 按 totalRD 降序排序
+
     return { players, totalTime, downtime, combatTime };
   } catch (error) {
     console.error('Error fetching damage done data:', error);
@@ -142,7 +157,7 @@ async function main() {
   const apiKey = ''; // 留空以测试默认值
 
   if (!logsId) {
-    console.error('缺少 logsId');
+    console.error('缺少 logsId，测试代码不会被执行。请在 apiConfig.ts 中配置 logsId');
     return;
   }
 

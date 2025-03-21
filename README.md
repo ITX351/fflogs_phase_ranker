@@ -1,5 +1,5 @@
 ## FFLogsPhaseRanker
-### 在线FFLogs分P伤害排名工具
+### 在线FFLogs分P伤害排名查询工具
 
 **访问 [https://your-deployment-url.com](https://your-deployment-url.com) 在线使用。**
 

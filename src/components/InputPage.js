@@ -9,11 +9,12 @@ function InputPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const urlPattern = /(?:https?:\/\/)?(?:[a-zA-Z0-9-]+\.)?fflogs\.com\/reports\/([a-zA-Z0-9]+)(?:\?fight=(\d+))?/;
-    const match = input.match(urlPattern);
+    const sanitizedInput = input.split('&')[0]; // 移除 & 及其后面的内容
+    const urlPattern = /^(?:https?:\/\/)?(?:[a-zA-Z0-9-]+\.)?fflogs\.com\/reports\/([a-zA-Z0-9]+)(?:\?fight=(\d+))?$|^[a-zA-Z0-9]{16,}$/;
+    const match = sanitizedInput.match(urlPattern);
 
     if (match) {
-      const logsId = match[1];
+      const logsId = match[1] || sanitizedInput; // 如果是纯日志 ID，直接使用输入值
       const fightId = match[2];
       if (logsId) {
         const query = apiKey ? `?apiKey=${apiKey}` : '';
@@ -26,7 +27,7 @@ function InputPage() {
 
   return (
     <div className="container mt-5">
-      <h1 className="text-center">FFLogs 分P伤害排名工具</h1>
+      <h1 className="text-center">FFLogs 分P伤害排名查询工具</h1>
       <form onSubmit={handleSubmit} className="mt-4">
         <div className="mb-3">
           <label htmlFor="logIdInput" className="form-label">请输入 FFLogs 链接或日志 ID：</label>
@@ -36,7 +37,7 @@ function InputPage() {
             className="form-control"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="例如：https://www.fflogs.com/reports/QrStUvWx12345678/1/ 或 QrStUvWx12345678"
+            placeholder="例如：https://www.fflogs.com/reports/QrStUvWx12345678?fight=1 或 QrStUvWx12345678"
           />
         </div>
         <div className="mb-3">
