@@ -11,6 +11,7 @@ interface Phase {
   startTime: number;
   endTime: number;
   name: string;
+  id: number;
 }
 
 interface Friendly {
@@ -49,6 +50,7 @@ interface PlayerDamageData {
   totalRDPS: number;
   totalADPS: number;
   totalNDPS: number;
+  predictLogs: number;
 }
 
 interface DamageDoneData {
@@ -59,6 +61,10 @@ interface DamageDoneData {
 }
 
 async function fetchLogData(logsId: string, apiKey: string): Promise<LogData | null> {
+  if (!logsId) {
+    logsId = apiConfig.logsId || '';
+  }
+  
   if (!apiKey) {
     apiKey = apiConfig.apiKey || '';
   }
@@ -94,6 +100,7 @@ async function fetchLogData(logsId: string, apiKey: string): Promise<LogData | n
               ? fight.phases[index + 1].startTime 
               : fight.end_time, // 计算结束时间
             name: `Phase ${index + 1}`,
+            id: phase.id,
           }))
         : [],
       friendlies: friendlies.filter((friendly) =>
@@ -112,6 +119,10 @@ async function fetchLogData(logsId: string, apiKey: string): Promise<LogData | n
 }
 
 async function fetchDamageDoneData(logsId: string, apiKey: string, start: number, end: number): Promise<DamageDoneData | null> {
+  if (!logsId) {
+    logsId = apiConfig.logsId || '';
+  }
+  
   if (!apiKey) {
     apiKey = apiConfig.apiKey || '';
   }
@@ -215,4 +226,4 @@ if (require.main === module) {
   main();
 }
 
-export { fetchLogData, fetchDamageDoneData };
+export { fetchLogData, fetchDamageDoneData, DamageDoneData };

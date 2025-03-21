@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './styles/global.css';
 import InputPage from './components/InputPage';
 import ResultPage from './components/ResultPage';
 import Footer from './components/Footer';

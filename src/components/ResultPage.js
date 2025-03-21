@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchLogData, fetchDamageDoneData } from '../api/fflogsApi';
+import { getConfigItemsByRaid, loadCsvData, updateDamageData } from '../api/dataProcessor';
 
 function ResultPage() {
   const { logsId, fightId } = useParams();
@@ -15,8 +16,8 @@ function ResultPage() {
   useEffect(() => {
     async function loadLogData() {
       if (!logsId) return;
-      const data = await fetchLogData(logsId, '');
-      setLogData(data);
+      const logData = await fetchLogData(logsId, '');
+      setLogData(logData);
     }
     loadLogData();
   }, [logsId]);
@@ -30,8 +31,15 @@ function ResultPage() {
       setLoading(true);
       const phaseData = {};
       for (const phase of fight.phases) {
-        const data = await fetchDamageDoneData(logsId, '', phase.startTime, phase.endTime);
-        phaseData[phase.name] = data;
+        const damageData = await fetchDamageDoneData(logsId, '', phase.startTime, phase.endTime);
+        if (damageData) {
+          const configItems = await getConfigItemsByRaid(fight.name, phase.id); // 异步调用 getConfigItemsByRaid
+          const csvData = await loadCsvData(configItems[0].dataFileName);
+          if (configItems.length > 0) {
+            updateDamageData(damageData, csvData, 0); // 使用第0个匹配的数据集更新伤害数据
+          }
+        }
+        phaseData[phase.name] = damageData;
       }
       setDamageData(phaseData);
       setLoading(false);
@@ -58,6 +66,16 @@ function ResultPage() {
   const handleMouseUp = () => {
     document.removeEventListener('mousemove', handleMouseMove);
     document.removeEventListener('mouseup', handleMouseUp);
+  };
+
+  const getLogColor = (logs) => {
+    if (logs > 100) return "#e5cc80";
+    if (logs >= 99) return "#e268a8";
+    if (logs >= 95) return "#ff8000";
+    if (logs >= 75) return "#a335ee";
+    if (logs >= 50) return "#0070ff";
+    if (logs >= 25) return "#1eff00";
+    return "#666";
   };
 
   return (
@@ -129,25 +147,35 @@ function ResultPage() {
             <p>加载战斗数据中...</p>
           ) : (
             Object.keys(damageData).length > 0 ? (
-              Object.entries(damageData).map(([phaseName, data]) => (
+              Object.entries(damageData).map(([phaseName, damageData]) => (
                 <div key={phaseName} className="mb-4">
                   <h5>{phaseName}</h5>
-                  {data && data.players && data.players.length > 0 ? (
+                  {damageData && damageData.players && damageData.players.length > 0 ? (
                     <table className="table table-striped">
                       <thead>
                         <tr>
                           <th>玩家</th>
                           <th>职业</th>
+                          <th>LOGS</th>
                           <th>RDPS</th>
                           <th>ADPS</th>
                           <th>NDPS</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {data.players.map(player => (
+                        {damageData.players.map(player => (
                           <tr key={player.id}>
                             <td>{player.name}</td>
                             <td>{player.type}</td>
+                            <td style={{ color: getLogColor(player.predictLogs) }}>
+                              {player.predictLogs === undefined
+                                ? '--'
+                                : player.predictLogs < 0
+                                ? '0-'
+                                : player.predictLogs > 100
+                                ? '100+'
+                                : player.predictLogs.toFixed(0)}
+                            </td>
                             <td>{player.totalRDPS.toFixed(2)}</td>
                             <td>{player.totalADPS.toFixed(2)}</td>
                             <td>{player.totalNDPS.toFixed(2)}</td>
