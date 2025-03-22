@@ -15,7 +15,7 @@ function Footer() {
       }}
     >
       <p style={{ pointerEvents: 'auto' }}> {/* 允许链接可点击 */}
-        <img src="/ITX351_logo.jpg" alt="Logo" style={{ height: '60px', width: '60px', marginRight: '5px', verticalAlign: 'middle' }} />
+        <img src="/fflogs_phase_ranker/ITX351_logo.jpg" alt="Logo" style={{ height: '60px', width: '60px', marginRight: '5px', verticalAlign: 'middle' }} />
         by <a href="https://space.bilibili.com/522021" target="_blank" rel="noopener noreferrer" style={{ color: '#6c757d' }}>ITX351</a> 王离@延夏 | <a href="https://github.com/ITX351/fflogs_phase_ranker" target="_blank" rel="noopener noreferrer" style={{ color: '#6c757d' }}>GitHub</a>
       </p>
     </footer>

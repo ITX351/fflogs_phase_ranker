@@ -1,12 +1,9 @@
 import { DamageDoneData, fetchLogData, fetchDamageDoneData } from './fflogsApi';
+import apiConfig from './apiConfig';
 
-// 尝试导入 apiConfig，如果不存在则使用默认值
-let apiConfig: { apiKey?: string; logsId?: string } = {};
-try {
-  apiConfig = require('./apiConfig').default;
-} catch {
-  console.warn('apiConfig not found, using default configuration.');
-}
+// 如果 apiConfig 的 valid 为 false，则将相关属性设为空值
+const logsId = apiConfig.valid ? apiConfig.logsId || '' : '';
+const apiKey = apiConfig.valid ? apiConfig.apiKey || '' : '';
 
 interface ConfigItem {
   datasetName: string;
@@ -17,7 +14,8 @@ interface ConfigItem {
   upperCombatTime: number;
 }
 
-const configFilePath = '/data/config.json';
+const pathPrefix = '/fflogs_phase_ranker/data/';
+const configFilePath = pathPrefix + 'config.json';
 
 /**
  * 读取 config.json 文件并返回数据项
@@ -44,7 +42,7 @@ async function getConfigItemsByRaid(raidName: string, phase: number): Promise<Co
  * 读取指定 CSV 文件并返回数据表
  */
 async function loadCsvData(fileName: string): Promise<{ headers: number[]; data: Record<string, number[]> }> {
-  const filePath = `/data/${fileName}`;
+  const filePath = pathPrefix + fileName;
   const response = await fetch(filePath);
   if (!response.ok) {
     throw new Error(`Failed to load CSV file: ${response.statusText}`);
@@ -109,8 +107,6 @@ async function updateDamageData(
 }
 
 async function main() {
-  const logsId = apiConfig.logsId || ''; // 从 apiConfig 获取日志 ID
-  const apiKey = apiConfig.apiKey || ''; // 从 apiConfig 获取 API 密钥
   const calculationMode = 0; // 预设计算模式
 
   if (!logsId || !apiKey) {

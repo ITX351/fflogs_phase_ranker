@@ -17,33 +17,35 @@ function ResultPage() {
   useEffect(() => {
     async function loadLogData() {
       if (!logsId) return;
-      const logData = await fetchLogData(logsId, '');
+      const apiKey = new URLSearchParams(window.location.search).get('apiKey') || ''; // 从 get 中获取 apiKey
+      const logData = await fetchLogData(logsId, apiKey); // 传入 apiKey
       if (!logData) {
-        setError('无法获取日志数据，请检查日志ID是否正确。'); // 设置错误信息
+        setError('无法获取日志数据，请检查日志ID和API_KEY是否正确。'); // 设置错误信息
         return;
       }
       setLogData(logData);
 
       // 如果 selectedFightId 为 "last"，设置为最后一场 fight 的 id
-      if (selectedFightId === "last" && logData.fights.length > 0) {
+      if (fightId === "last" && logData.fights.length > 0) {
         const lastFightId = logData.fights[logData.fights.length - 1].id.toString();
         setSelectedFightId(lastFightId);
-        navigate(`/${logsId}/${lastFightId}`);
+        navigate(`/${logsId}/${lastFightId}?apiKey=${apiKey}`);
       }
     }
     loadLogData();
-  }, [logsId]);
+  }, [logsId, fightId, navigate]);
 
   useEffect(() => {
     async function loadDamageData() {
       if (!selectedFightId || !logData) return;
+      const apiKey = new URLSearchParams(window.location.search).get('apiKey') || ''; // 从 get 中获取 apiKey
       const fight = logData.fights.find(f => f.id === parseInt(selectedFightId));
       if (!fight) return;
 
       setLoading(true);
       const phaseData = {};
       for (const phase of fight.phases) {
-        const damageData = await fetchDamageDoneData(logsId, '', phase.startTime, phase.endTime);
+        const damageData = await fetchDamageDoneData(logsId, apiKey, phase.startTime, phase.endTime); // 传入 apiKey
         if (damageData) {
           const configItems = await getConfigItemsByRaid(fight.name, phase.id); // 异步调用 getConfigItemsByRaid
           if (configItems.length > 0) {
@@ -59,8 +61,9 @@ function ResultPage() {
   }, [selectedFightId, logData, logsId]);
 
   const handleFightClick = (id) => {
+    const apiKey = new URLSearchParams(window.location.search).get('apiKey') || ''; // 从 get 中获取 apiKey
     setSelectedFightId(id.toString());
-    navigate(`/${logsId}/${id}`);
+    navigate(`/${logsId}/${id}?apiKey=${apiKey}`);
   };
 
   const handleMouseDown = (e) => {
@@ -80,7 +83,7 @@ function ResultPage() {
   };
 
   const getLogColor = (logs) => {
-    if (logs > 100) return "#e5cc80";
+    if (logs >= 99.5) return "#e5cc80";
     if (logs >= 98.5) return "#e268a8";
     if (logs >= 94.5) return "#ff8000";
     if (logs >= 74.5) return "#a335ee";

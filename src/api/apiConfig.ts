@@ -4,7 +4,7 @@ const apiConfig = {
   apiKey: 'abcd1234efgh5678ijkl9012mnop3456', // 在此处填写你默认的私人 API 密钥
   logsId: 'QrStUvWx12345678', // 在此处填写你默认的 FFLogs 日志 ID
   fightIds: [1, 2], // 在此处填写该份日志的 fight ID，留空或填0则检索所有 fight
-  valid: false, // 改为true以启用此配置
+  valid: false, // 改为 true 以启用此配置
 };
 
 export default apiConfig;

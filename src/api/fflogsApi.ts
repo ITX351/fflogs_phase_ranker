@@ -1,11 +1,9 @@
 import axios from 'axios';
-// 尝试导入 apiConfig，如果不存在则使用默认值
-let apiConfig: { apiKey?: string; logsId?: string; fightIds?: number[] } = {};
-try {
-  apiConfig = require('./apiConfig').default;
-} catch {
-  console.warn('apiConfig not found, using default configuration.');
-}
+import apiConfig from './apiConfig';
+
+// 如果 apiConfig 的 valid 为 false，则将相关属性设为空值
+const logsId = apiConfig.valid ? apiConfig.logsId || '' : '';
+const apiKey = apiConfig.valid ? apiConfig.apiKey || '' : '';
 
 interface Phase {
   startTime: number;
@@ -60,20 +58,15 @@ interface DamageDoneData {
   combatTime: number;
 }
 
-async function fetchLogData(logsId: string, apiKey: string): Promise<LogData | null> {
-  if (!logsId) {
-    logsId = apiConfig.logsId || '';
-  }
-  
-  if (!apiKey) {
-    apiKey = apiConfig.apiKey || '';
-  }
+async function fetchLogData(logsIdParam: string, apiKeyParam: string): Promise<LogData | null> {
+  const logsIdToUse = logsIdParam || logsId;
+  const apiKeyToUse = apiKeyParam || apiKey;
 
-  if (!logsId || !apiKey) {
+  if (!logsIdToUse || !apiKeyToUse) {
     throw new Error('缺少 logsId 或 apiKey');
   }
 
-  const fightsUrl = `https://cn.fflogs.com/v1/report/fights/${logsId}?api_key=${apiKey}`;
+  const fightsUrl = `https://cn.fflogs.com/v1/report/fights/${logsIdToUse}?api_key=${apiKeyToUse}`;
   console.log('Fetching log data from:', fightsUrl);
 
   try {
@@ -118,20 +111,15 @@ async function fetchLogData(logsId: string, apiKey: string): Promise<LogData | n
   }
 }
 
-async function fetchDamageDoneData(logsId: string, apiKey: string, start: number, end: number): Promise<DamageDoneData | null> {
-  if (!logsId) {
-    logsId = apiConfig.logsId || '';
-  }
-  
-  if (!apiKey) {
-    apiKey = apiConfig.apiKey || '';
-  }
+async function fetchDamageDoneData(logsIdParam: string, apiKeyParam: string, start: number, end: number): Promise<DamageDoneData | null> {
+  const logsIdToUse = logsIdParam || logsId;
+  const apiKeyToUse = apiKeyParam || apiKey;
 
-  if (!logsId || !apiKey) {
+  if (!logsIdToUse || !apiKeyToUse) {
     throw new Error('缺少 logsId 或 apiKey');
   }
 
-  const url = `https://cn.fflogs.com/v1/report/tables/damage-done/${logsId}?api_key=${apiKey}&start=${start}&end=${end}`;
+  const url = `https://cn.fflogs.com/v1/report/tables/damage-done/${logsIdToUse}?api_key=${apiKeyToUse}&start=${start}&end=${end}`;
   console.log('Fetching damage done data from:', url);
 
   try {

@@ -7,7 +7,7 @@ import Footer from './components/Footer';
 
 function App() {
   return (
-    <Router>
+    <Router basename="/fflogs_phase_ranker">
       <div className="App">
         <Routes>
           <Route path="/" element={<InputPage />} />

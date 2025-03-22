@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import apiConfig from '../api/apiConfig'; // 导入 apiConfig
 
 function InputPage() {
   const [input, setInput] = useState('');
@@ -9,6 +10,13 @@ function InputPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // 如果 apiConfig.valid 为 false，强制要求输入 logsId 和 API_KEY
+    if (!apiConfig.valid && (!input || !apiKey)) {
+      alert('当前配置无效，请提供日志 ID 和 API_KEY');
+      return;
+    }
+
     const sanitizedInput = input.split('&')[0]; // 移除 & 及其后面的内容
     const urlPattern = /^(?:https?:\/\/)?(?:[a-zA-Z0-9-]+\.)?fflogs\.com\/reports\/(a:[a-zA-Z0-9]+|[a-zA-Z0-9]+)(?:\?fight=([a-zA-Z0-9]+))?$|^[a-zA-Z0-9]{16,}$/;
     const match = sanitizedInput.match(urlPattern);
@@ -17,7 +25,7 @@ function InputPage() {
       const logsId = match[1] || sanitizedInput; // 如果是纯日志 ID，直接使用输入值
       const fightId = match[2];
       if (logsId) {
-        const query = apiKey ? `?apiKey=${apiKey}` : '';
+        const query = apiKey ? `?apiKey=${apiKey}` : ''; // 将 apiKey 添加到查询参数
         navigate(fightId ? `/${logsId}/${fightId}${query}` : `/${logsId}${query}`);
       }
     } else {

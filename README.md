@@ -1,7 +1,7 @@
 ## FFLogsPhaseRanker
 ### 在线FFLogs分P伤害排名查询工具
 
-**访问 [https://your-deployment-url.com](https://your-deployment-url.com) 在线使用。**
+**访问 [https://itx351.github.io/fflogs_phase_ranker](https://itx351.github.io/fflogs_phase_ranker) 在线使用。**
 
 ---
 
