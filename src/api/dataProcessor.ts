@@ -14,6 +14,7 @@ interface ConfigItem {
   raidMatchNames: string[];
   raidLogsPhase: number;
   dataFileName: string;
+  upperCombatTime: number;
 }
 
 const configFilePath = '/data/config.json';
@@ -64,23 +65,29 @@ async function loadCsvData(fileName: string): Promise<{ headers: number[]; data:
 /**
  * 更新 DamageDoneData 的玩家数据，计算预估伤害比例
  */
-function updateDamageData(
+async function updateDamageData(
   damageData: DamageDoneData,
-  csvData: { headers: number[]; data: Record<string, number[]> },
+  configItem: ConfigItem,
   calculationMode: number
-): void {
+): Promise<void> {
+  const csvData = await loadCsvData(configItem.dataFileName);
   const { headers: csvHeaders, data: csvTable } = csvData;
-
   damageData.players.forEach(player => {
-    const totalTime = calculationMode === 0
+    let totalTime = calculationMode === 0
       ? damageData.totalTime - damageData.downtime
       : damageData.combatTime - damageData.downtime;
+    
+    if (configItem.upperCombatTime && totalTime > configItem.upperCombatTime) {
+      console.log(`Total combat time exceeds the upper limit: ${totalTime} > ${configItem.upperCombatTime}`);
+      totalTime = configItem.upperCombatTime; // 限制战斗时间
+    }
 
     const rdps = player.totalRD / totalTime * 1000;
     // const adps = player.totalAD / totalTime * 1000;
     // const ndps = player.totalND / totalTime * 1000;
 
-    console.log("csvTable", csvTable);
+    // console.log("csvTable", csvTable);
+    // console.log("Processing ", configItem.datasetName, totalTime, rdps);
     const playerData = csvTable[player.type];
     if (playerData) {
       if (rdps > playerData[0]) {
@@ -138,8 +145,7 @@ async function main() {
         }
 
         const configItem = configItems[0]; // 使用最新的配置项
-        const csvData = await loadCsvData(configItem.dataFileName);
-        updateDamageData(damageData, csvData, calculationMode);
+        updateDamageData(damageData, configItem, calculationMode);
 
         console.log(`Updated Damage Data for Phase ${phaseId}:`);
         damageData.players.forEach(player => {
@@ -156,4 +162,4 @@ if (require.main === module) {
   main();
 }
 
-export { getConfigItemsByRaid, loadCsvData, updateDamageData };
+export { getConfigItemsByRaid, updateDamageData };

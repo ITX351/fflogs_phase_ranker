@@ -1,23 +1,35 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchLogData, fetchDamageDoneData } from '../api/fflogsApi';
-import { getConfigItemsByRaid, loadCsvData, updateDamageData } from '../api/dataProcessor';
+import { getConfigItemsByRaid, updateDamageData } from '../api/dataProcessor';
 
 function ResultPage() {
   const { logsId, fightId } = useParams();
   const navigate = useNavigate();
   const [logData, setLogData] = useState(null);
   const [selectedFightId, setSelectedFightId] = useState(fightId || null);
-  const [damageData, setDamageData] = useState({});
+  const [phaseData, setPhaseData] = useState({});
   const [loading, setLoading] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(250);
   const resizerRef = useRef(null);
+  const [error, setError] = useState(null); // 新增状态用于存储错误信息
 
   useEffect(() => {
     async function loadLogData() {
       if (!logsId) return;
       const logData = await fetchLogData(logsId, '');
+      if (!logData) {
+        setError('无法获取日志数据，请检查日志ID是否正确。'); // 设置错误信息
+        return;
+      }
       setLogData(logData);
+
+      // 如果 selectedFightId 为 "last"，设置为最后一场 fight 的 id
+      if (selectedFightId === "last" && logData.fights.length > 0) {
+        const lastFightId = logData.fights[logData.fights.length - 1].id.toString();
+        setSelectedFightId(lastFightId);
+        navigate(`/${logsId}/${lastFightId}`);
+      }
     }
     loadLogData();
   }, [logsId]);
@@ -34,14 +46,13 @@ function ResultPage() {
         const damageData = await fetchDamageDoneData(logsId, '', phase.startTime, phase.endTime);
         if (damageData) {
           const configItems = await getConfigItemsByRaid(fight.name, phase.id); // 异步调用 getConfigItemsByRaid
-          const csvData = await loadCsvData(configItems[0].dataFileName);
           if (configItems.length > 0) {
-            updateDamageData(damageData, csvData, 0); // 使用第0个匹配的数据集更新伤害数据
+            await updateDamageData(damageData, configItems[0], 0); // 默认使用最新的配置项
           }
         }
         phaseData[phase.name] = damageData;
       }
-      setDamageData(phaseData);
+      setPhaseData(phaseData);
       setLoading(false);
     }
     loadDamageData();
@@ -70,11 +81,11 @@ function ResultPage() {
 
   const getLogColor = (logs) => {
     if (logs > 100) return "#e5cc80";
-    if (logs >= 99) return "#e268a8";
-    if (logs >= 95) return "#ff8000";
-    if (logs >= 75) return "#a335ee";
-    if (logs >= 50) return "#0070ff";
-    if (logs >= 25) return "#1eff00";
+    if (logs >= 98.5) return "#e268a8";
+    if (logs >= 94.5) return "#ff8000";
+    if (logs >= 74.5) return "#a335ee";
+    if (logs >= 49.5) return "#0070ff";
+    if (logs >= 24.5) return "#1eff00";
     return "#666";
   };
 
@@ -142,12 +153,14 @@ function ResultPage() {
         onMouseDown={handleMouseDown}
       ></div>
       <div className="flex-grow-1 p-3" style={{ marginBottom: '100px' }}> {/* 使用 marginBottom 确保内容不会被页脚遮挡 */}
-        {selectedFightId ? (
-          loading ? (
+        {error ? ( // 如果存在错误信息，显示错误提示
+          <p className="text-danger">{error}</p>
+        ) : selectedFightId ? (
+          loading || !logData ? (
             <p>加载战斗数据中...</p>
           ) : (
-            Object.keys(damageData).length > 0 ? (
-              Object.entries(damageData).map(([phaseName, damageData]) => (
+            Object.keys(phaseData).length > 0 ? (
+              Object.entries(phaseData).map(([phaseName, damageData]) => (
                 <div key={phaseName} className="mb-4">
                   <h5>{phaseName}</h5>
                   {damageData && damageData.players && damageData.players.length > 0 ? (

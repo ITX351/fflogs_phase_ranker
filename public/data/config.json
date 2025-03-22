@@ -1,44 +1,54 @@
 [
     {
         "datasetName": "Eden's Promise Phase 1",
-        "creationDate": "2023-10-01",
+        "creationDate": "2025-03-14",
         "raidMatchNames": ["Futures Rewritten"],
         "raidLogsPhase": 1,
         "dataFileName": "eden7.1p1.csv"
     },
     {
         "datasetName": "Eden's Promise Phase 2",
-        "creationDate": "2023-10-01",
+        "creationDate": "2025-03-16",
         "raidMatchNames": ["Futures Rewritten"],
         "raidLogsPhase": 2,
         "dataFileName": "eden7.1p2.csv"
     },
     {
         "datasetName": "Eden's Promise Phase 3",
-        "creationDate": "2023-10-01",
+        "creationDate": "2025-03-16",
         "raidMatchNames": ["Futures Rewritten"],
         "raidLogsPhase": 3,
         "dataFileName": "eden7.1p3.csv"
     },
     {
         "datasetName": "Eden's Promise Phase 4",
-        "creationDate": "2023-10-01",
+        "creationDate": "2025-03-17",
         "raidMatchNames": ["Futures Rewritten"],
         "raidLogsPhase": 4,
-        "dataFileName": "eden7.1p4.csv"
+        "dataFileName": "eden7.1p4.csv",
+        "upperCombatTime": 10000000
     },
     {
         "datasetName": "Eden's Promise Phase 5",
-        "creationDate": "2023-10-01",
+        "creationDate": "2025-02-28",
         "raidMatchNames": ["Futures Rewritten"],
         "raidLogsPhase": 5,
-        "dataFileName": "eden7.1p5.csv"
+        "dataFileName": "eden7.1p5.csv",
+        "upperCombatTime": 273000
     },
     {
         "datasetName": "Omega Protocol Phase 3",
-        "creationDate": "2023-10-01",
-        "raidMatchNames": ["Omega Protocol"],
+        "creationDate": "2025-03-04",
+        "raidMatchNames": ["The Omega Protocol"],
         "raidLogsPhase": 3,
         "dataFileName": "omega7.1p3.csv"
+    },
+    {
+        "datasetName": "Omega Protocol Phase 6",
+        "creationDate": "2025-02-27",
+        "raidMatchNames": ["The Omega Protocol"],
+        "raidLogsPhase": 6,
+        "dataFileName": "omega7.1p6.csv",
+        "upperCombatTime": 268200
     }
 ]

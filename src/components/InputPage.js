@@ -10,7 +10,7 @@ function InputPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
     const sanitizedInput = input.split('&')[0]; // 移除 & 及其后面的内容
-    const urlPattern = /^(?:https?:\/\/)?(?:[a-zA-Z0-9-]+\.)?fflogs\.com\/reports\/([a-zA-Z0-9]+)(?:\?fight=(\d+))?$|^[a-zA-Z0-9]{16,}$/;
+    const urlPattern = /^(?:https?:\/\/)?(?:[a-zA-Z0-9-]+\.)?fflogs\.com\/reports\/(a:[a-zA-Z0-9]+|[a-zA-Z0-9]+)(?:\?fight=([a-zA-Z0-9]+))?$|^[a-zA-Z0-9]{16,}$/;
     const match = sanitizedInput.match(urlPattern);
 
     if (match) {
