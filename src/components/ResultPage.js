@@ -105,7 +105,10 @@ function ResultPage() {
         <div className="d-flex align-items-center p-3">
           <button
             className="btn btn-link text-decoration-none"
-            onClick={() => navigate('/')}
+            onClick={() => {
+              const apiKey = new URLSearchParams(window.location.search).get('apiKey') || ''; // 获取 apiKey
+              navigate(`/?apiKey=${apiKey}`); // 将 apiKey 添加到导航路径
+            }}
             style={{ fontSize: '1.5rem' }}
             title="返回主页"
           >

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiConfig from '../api/apiConfig'; // 导入 apiConfig
 
@@ -7,6 +7,15 @@ function InputPage() {
   const [apiKey, setApiKey] = useState('');
   const [showHelp, setShowHelp] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // 从 URL 参数中获取 apiKey
+    const urlParams = new URLSearchParams(window.location.search);
+    const apiKeyFromUrl = urlParams.get('apiKey');
+    if (apiKeyFromUrl) {
+      setApiKey(apiKeyFromUrl);
+    }
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -31,6 +40,11 @@ function InputPage() {
     } else {
       alert('请输入有效的 FFLogs 链接或日志 ID');
     }
+  };
+
+  const generateBookmarkLink = () => {
+    const currentUrl = window.location.origin + window.location.pathname;
+    return `${currentUrl}?apiKey=${apiKey}`;
   };
 
   return (
@@ -71,9 +85,13 @@ function InputPage() {
               <ol>
                 <li>登录您的 FFLogs 账户。</li>
                 <li>访问 <a href="https://cn.fflogs.com/profile" target="_blank" rel="noopener noreferrer">FFLogs 个人设置页</a>，翻到最下方找到“网页API”。</li>
-                <li>随意输入一个客户端名称，创建一个新的 API 密钥，并复制该密钥。</li>
+                <li><span style={{ fontWeight: 'bold', color: 'red', fontSize: '1.3em' }}>随意输入一个V1客户名称，</span>确定，然后复制V1客户端密钥。</li>
               </ol>
               <p>请妥善保管您的 API_KEY，不要泄露给他人。</p>
+              <p>您可以填写API_KEY后，访问以下链接，然后将该页面保存到收藏夹，方便下次使用：</p>
+              <a href={generateBookmarkLink()} target="_blank" rel="noopener noreferrer" className="btn btn-outline-secondary">
+                生成带 API_KEY 的收藏链接
+              </a>
             </div>
           )}
         </div>
