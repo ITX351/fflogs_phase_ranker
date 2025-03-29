@@ -18,12 +18,24 @@ function ResultPage() {
     async function loadLogData() {
       if (!logsId) return;
       const apiKey = new URLSearchParams(window.location.search).get('apiKey') || ''; // 从 get 中获取 apiKey
-      const logData = await fetchLogData(logsId, apiKey); // 传入 apiKey
-      if (!logData) {
-        setError('无法获取日志数据，请检查日志ID和API_KEY是否正确。'); // 设置错误信息
+      try {
+        const logData = await fetchLogData(logsId, apiKey);
+        setLogData(logData);
+      } catch (error) {
+        if (error instanceof Error) {
+          console.error('Error fetching log data:', error);
+          setError(
+            <>
+              无法获取日志数据，请检查日志ID和API_KEY是否正确。
+              <br />
+              {error.message}
+            </>
+          );
+        } else {
+          setError('发生未知错误');
+        }
         return;
       }
-      setLogData(logData);
 
       // 如果 selectedFightId 为 "last"，设置为最后一场 fight 的 id
       if (fightId === "last" && logData.fights.length > 0) {

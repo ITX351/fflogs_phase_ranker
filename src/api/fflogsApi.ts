@@ -104,8 +104,14 @@ async function fetchLogData(logsIdParam: string, apiKeyParam: string): Promise<L
 
     return { title, fights, friendlies };
   } catch (error) {
-    console.error('Error fetching log data:', error);
-    return null;
+    if (axios.isAxiosError(error) && error.response) {
+      const errorMessage = error.response?.data?.error || 'Unknown error';
+      console.error('Error fetching log data:', errorMessage);
+      throw new Error(errorMessage);
+    } else {
+      console.error('Unexpected error:', error);
+      throw new Error('Unexpected error occurred while fetching log data.');
+    }
   }
 }
 
