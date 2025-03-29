@@ -37,11 +37,40 @@
         "upperCombatTime": 273000
     },
     {
+        "datasetName": "Omega Protocol Phase 1",
+        "creationDate": "2025-03-30",
+        "raidMatchNames": ["The Omega Protocol"],
+        "raidLogsPhase": 1,
+        "dataFileName": "omega7.1p1.csv",
+        "calculationMode": 1
+    },
+    {
+        "datasetName": "Omega Protocol Phase 2",
+        "creationDate": "2025-03-30",
+        "raidMatchNames": ["The Omega Protocol"],
+        "raidLogsPhase": 2,
+        "dataFileName": "omega7.1p2.csv"
+    },
+    {
         "datasetName": "Omega Protocol Phase 3",
         "creationDate": "2025-03-04",
         "raidMatchNames": ["The Omega Protocol"],
         "raidLogsPhase": 3,
         "dataFileName": "omega7.1p3.csv"
+    },
+    {
+        "datasetName": "Omega Protocol Phase 4",
+        "creationDate": "2025-03-30",
+        "raidMatchNames": ["The Omega Protocol"],
+        "raidLogsPhase": 4,
+        "dataFileName": "omega7.1p4.csv"
+    },
+    {
+        "datasetName": "Omega Protocol Phase 5",
+        "creationDate": "2025-03-30",
+        "raidMatchNames": ["The Omega Protocol"],
+        "raidLogsPhase": 5,
+        "dataFileName": "omega7.1p5.csv"
     },
     {
         "datasetName": "Omega Protocol Phase 6",
