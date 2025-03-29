@@ -17,10 +17,16 @@ function ResultPage() {
   useEffect(() => {
     async function loadLogData() {
       if (!logsId) return;
-      const apiKey = new URLSearchParams(window.location.search).get('apiKey') || ''; // 从 get 中获取 apiKey
+      const apiKey = new URLSearchParams(window.location.search).get('apiKey') || '';
       try {
         const logData = await fetchLogData(logsId, apiKey);
         setLogData(logData);
+
+        if (fightId === "last" && logData.fights.length > 0) {
+          const lastFightId = logData.fights[logData.fights.length - 1].id.toString();
+          setSelectedFightId(lastFightId);
+          navigate(`/${logsId}/${lastFightId}?apiKey=${apiKey}`);
+        }
       } catch (error) {
         if (error instanceof Error) {
           console.error('Error fetching log data:', error);
@@ -34,14 +40,6 @@ function ResultPage() {
         } else {
           setError('发生未知错误');
         }
-        return;
-      }
-
-      // 如果 selectedFightId 为 "last"，设置为最后一场 fight 的 id
-      if (fightId === "last" && logData.fights.length > 0) {
-        const lastFightId = logData.fights[logData.fights.length - 1].id.toString();
-        setSelectedFightId(lastFightId);
-        navigate(`/${logsId}/${lastFightId}?apiKey=${apiKey}`);
       }
     }
     loadLogData();
@@ -57,14 +55,15 @@ function ResultPage() {
       setLoading(true);
       const phaseData = {};
       for (const phase of fight.phases) {
+        //console.log('Fetching damage data for phase:', phase.id); // 调试信息
         const damageData = await fetchDamageDoneData(logsId, apiKey, phase.startTime, phase.endTime); // 传入 apiKey
         if (damageData) {
           const configItems = await getConfigItemsByRaid(fight.name, phase.id); // 异步调用 getConfigItemsByRaid
           if (configItems.length > 0) {
-            await updateDamageData(damageData, configItems[0], 0); // 默认使用最新的配置项
+            const effectiveDuration = await updateDamageData(damageData, configItems[0]); // 默认使用最新的配置项
+            phaseData[phase.name] = { damageData, effectiveDuration: effectiveDuration / 1000 }; // 转换为秒
           }
         }
-        phaseData[phase.name] = damageData;
       }
       setPhaseData(phaseData);
       setLoading(false);
@@ -178,12 +177,22 @@ function ResultPage() {
             <p>加载战斗数据中...</p>
           ) : (
             Object.keys(phaseData).length > 0 ? (
-              Object.entries(phaseData).map(([phaseName, damageData]) => (
+              Object.entries(phaseData).map(([phaseName, { damageData, effectiveDuration }]) => (
                 <div key={phaseName} className="mb-4">
-                  <h5>{phaseName}</h5>
+                  <h5>
+                    {phaseName}
+                    {effectiveDuration && (
+                      <span
+                        className="text-muted ms-4"
+                        style={{ fontSize: '0.9rem' }}
+                      >
+                        {effectiveDuration.toFixed(2)}秒
+                      </span>
+                    )}
+                  </h5>
                   {damageData && damageData.players && damageData.players.length > 0 ? (
-                    <table className="table table-striped">
-                      <thead>
+                    <table className="table table-striped" style={{ fontFamily: 'Consolas' }}>
+                      <thead style={{ fontWeight: 'bold' }}>
                         <tr>
                           <th>玩家</th>
                           <th>职业</th>

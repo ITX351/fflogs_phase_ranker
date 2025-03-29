@@ -10,6 +10,7 @@ interface ConfigItem {
   raidLogsPhase: number;
   dataFileName: string;
   upperCombatTime: number;
+  calculationMode: number;
 }
 
 const pathPrefix = '/fflogs_phase_ranker/data/';
@@ -63,28 +64,28 @@ async function loadCsvData(fileName: string): Promise<{ headers: number[]; data:
  */
 async function updateDamageData(
   damageData: DamageDoneData,
-  configItem: ConfigItem,
-  calculationMode: number
-): Promise<void> {
+  configItem: ConfigItem
+): Promise<number | undefined> {
   const csvData = await loadCsvData(configItem.dataFileName);
   const { headers: csvHeaders, data: csvTable } = csvData;
+  
+  let totalTime = configItem.calculationMode
+    ? damageData.combatTime - damageData.downtime 
+    : damageData.totalTime - damageData.downtime;
+  if (configItem.upperCombatTime && totalTime > configItem.upperCombatTime) {
+    console.log(`Total combat time exceeds the upper limit: ${totalTime} > ${configItem.upperCombatTime}`);
+    totalTime = configItem.upperCombatTime; // 限制战斗时间
+  }
+  
   damageData.players.forEach(player => {
-    let totalTime = calculationMode === 0
-      ? damageData.totalTime - damageData.downtime
-      : damageData.combatTime - damageData.downtime;
-    
-    if (configItem.upperCombatTime && totalTime > configItem.upperCombatTime) {
-      console.log(`Total combat time exceeds the upper limit: ${totalTime} > ${configItem.upperCombatTime}`);
-      totalTime = configItem.upperCombatTime; // 限制战斗时间
-    }
-
     const rdps = player.totalRD / totalTime * 1000;
     // const adps = player.totalAD / totalTime * 1000;
     // const ndps = player.totalND / totalTime * 1000;
 
     // console.log("csvTable", csvTable);
-    // console.log("Processing ", configItem.datasetName, totalTime, rdps);
+    //console.log("Processing ", configItem.datasetName, totalTime, player.totalRD, rdps, player.name, player.type, configItem.calculationMode);
     const playerData = csvTable[player.type];
+    player.totalRDPS = rdps;
     if (playerData) {
       if (rdps > playerData[0]) {
         player.predictLogs = 101;
@@ -102,11 +103,10 @@ async function updateDamageData(
       }
     }
   });
+  return totalTime;
 }
 
 async function main() {
-  const calculationMode = 0; // 预设计算模式
-
   if (!logsId || !apiKey) {
     console.error('缺少 logsId 或 apiKey，请在 .env 中配置。');
     return;
@@ -139,7 +139,7 @@ async function main() {
         }
 
         const configItem = configItems[0]; // 使用最新的配置项
-        updateDamageData(damageData, configItem, calculationMode);
+        console.log(updateDamageData(damageData, configItem));
 
         console.log(`Updated Damage Data for Phase ${phaseId}:`);
         damageData.players.forEach(player => {
