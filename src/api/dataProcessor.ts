@@ -1,9 +1,7 @@
 import { DamageDoneData, fetchLogData, fetchDamageDoneData } from './fflogsApi';
-import apiConfig from './apiConfig';
 
-// 如果 apiConfig 的 valid 为 false，则将相关属性设为空值
-const logsId = apiConfig.valid ? apiConfig.logsId || '' : '';
-const apiKey = apiConfig.valid ? apiConfig.apiKey || '' : '';
+const logsId = process.env.REACT_APP_LOGS_ID || '';
+const apiKey = process.env.REACT_APP_API_KEY || '';
 
 interface ConfigItem {
   datasetName: string;
@@ -110,7 +108,7 @@ async function main() {
   const calculationMode = 0; // 预设计算模式
 
   if (!logsId || !apiKey) {
-    console.error('缺少 logsId 或 apiKey，请在 apiConfig.ts 中配置。');
+    console.error('缺少 logsId 或 apiKey，请在 .env 中配置。');
     return;
   }
 
