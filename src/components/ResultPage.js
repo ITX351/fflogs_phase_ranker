@@ -158,7 +158,7 @@ function ResultPage() {
         }}
         onMouseDown={handleMouseDown}
       ></div>
-      <div className="flex-grow-1 p-3" style={{ marginBottom: '100px' }}> {/* 使用 marginBottom 确保内容不会被页脚遮挡 */}
+      <div className="flex-grow-1 p-3" style={{ marginBottom: '30px' }}> {/* 使用 marginBottom 确保内容不会被页脚遮挡 */}
         {error ? ( // 如果存在错误信息，显示错误提示
           <p className="text-danger">{error}</p>
         ) : selectedFightId ? (
