@@ -1,9 +1,7 @@
 import axios from 'axios';
-import apiConfig from './apiConfig';
 
-// 如果 apiConfig 的 valid 为 false，则将相关属性设为空值
-const logsId = apiConfig.valid ? apiConfig.logsId || '' : '';
-const apiKey = apiConfig.valid ? apiConfig.apiKey || '' : '';
+const logsId = process.env.REACT_APP_LOGS_ID || '';
+const apiKey = process.env.REACT_APP_API_KEY || '';
 
 interface Phase {
   startTime: number;
@@ -106,8 +104,14 @@ async function fetchLogData(logsIdParam: string, apiKeyParam: string): Promise<L
 
     return { title, fights, friendlies };
   } catch (error) {
-    console.error('Error fetching log data:', error);
-    return null;
+    if (axios.isAxiosError(error) && error.response) {
+      const errorMessage = error.response?.data?.error || 'Unknown error';
+      console.error('Error fetching log data:', errorMessage);
+      throw new Error(errorMessage);
+    } else {
+      console.error('Unexpected error:', error);
+      throw new Error('Unexpected error occurred while fetching log data.');
+    }
   }
 }
 
@@ -152,11 +156,8 @@ async function fetchDamageDoneData(logsIdParam: string, apiKeyParam: string, sta
 }
 
 async function main() {
-  const logsId = apiConfig.logsId || '';
-  const apiKey = ''; // 留空以测试默认值
-
   if (!logsId) {
-    console.error('缺少 logsId，测试代码不会被执行。请在 apiConfig.ts 中配置 logsId');
+    console.error('缺少 logsId，测试代码不会被执行。请在 .env 中配置 logsId');
     return;
   }
 
@@ -171,9 +172,10 @@ async function main() {
 
       console.log('Fights:');
       console.log(`  Total Fights: ${logData.fights.length}`);
-      const fightIds = apiConfig.fightIds ? apiConfig.fightIds : [];
-      const filteredFights = fightIds.length > 0
-        ? logData.fights.filter((fight) => fightIds.includes(fight.id))
+      const fightId = process.env.REACT_APP_FIGHT_ID || -1; // 从环境变量中获取战斗 ID
+      
+      const filteredFights = fightId !== -1
+        ? logData.fights.filter((fight) => fight.id === Number(fightId))
         : logData.fights;
 
       for (const fight of filteredFights) {

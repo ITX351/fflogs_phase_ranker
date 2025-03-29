@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import apiConfig from '../api/apiConfig'; // 导入 apiConfig
 
 function InputPage() {
   const [input, setInput] = useState('');
@@ -20,13 +19,29 @@ function InputPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // 如果 apiConfig.valid 为 false，强制要求输入 logsId 和 API_KEY
-    if (!apiConfig.valid && (!input || !apiKey)) {
-      alert('当前配置无效，请提供日志 ID 和 API_KEY');
-      return;
+    let finalInput = input;
+    let finalApiKey = apiKey;
+
+    if (!finalInput) {
+      if (process.env.REACT_APP_LOGS_ID !== undefined) {
+        finalInput = process.env.REACT_APP_LOGS_ID; // 使用环境变量作为输入
+        setInput(finalInput); // 更新状态
+      } else {
+        alert('请输入 FFLogs 链接或日志 ID');
+        return;
+      }
+    }
+    if (!finalApiKey) {
+      if (process.env.REACT_APP_API_KEY !== undefined) {
+        finalApiKey = process.env.REACT_APP_API_KEY; // 使用环境变量作为 API_KEY
+        setApiKey(finalApiKey); // 更新状态
+      } else {
+        alert('请输入 API_KEY');
+        return;
+      }
     }
 
-    const sanitizedInput = input.split('&')[0]; // 移除 & 及其后面的内容
+    const sanitizedInput = finalInput.split('&')[0]; // 移除 & 及其后面的内容
     const urlPattern = /^(?:https?:\/\/)?(?:[a-zA-Z0-9-]+\.)?fflogs\.com\/reports\/(a:[a-zA-Z0-9]+|[a-zA-Z0-9]+)(?:\?fight=([a-zA-Z0-9]+))?$|^[a-zA-Z0-9]{16,}$/;
     const match = sanitizedInput.match(urlPattern);
 
@@ -34,11 +49,11 @@ function InputPage() {
       const logsId = match[1] || sanitizedInput; // 如果是纯日志 ID，直接使用输入值
       const fightId = match[2];
       if (logsId) {
-        const query = apiKey ? `?apiKey=${apiKey}` : ''; // 将 apiKey 添加到查询参数
+        const query = finalApiKey ? `?apiKey=${finalApiKey}` : ''; // 将 apiKey 添加到查询参数
         navigate(fightId ? `/${logsId}/${fightId}${query}` : `/${logsId}${query}`);
       }
     } else {
-      alert('请输入有效的 FFLogs 链接或日志 ID');
+      alert('输入的 FFLogs 链接或日志 ID 格式无效');
     }
   };
 
