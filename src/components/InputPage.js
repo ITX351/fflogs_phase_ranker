@@ -1,20 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 function InputPage() {
   const [input, setInput] = useState('');
   const [apiKey, setApiKey] = useState('');
   const [showHelp, setShowHelp] = useState(false);
   const navigate = useNavigate();
+  const { apiKey: routeApiKey } = useParams(); // 从路由参数中获取 apiKey
 
   useEffect(() => {
-    // 从 URL 参数中获取 apiKey
-    const urlParams = new URLSearchParams(window.location.search);
-    const apiKeyFromUrl = urlParams.get('apiKey');
-    if (apiKeyFromUrl) {
-      setApiKey(apiKeyFromUrl);
+    if (routeApiKey) {
+      setApiKey(routeApiKey); // 设置初始 apiKey
     }
-  }, []);
+  }, [routeApiKey]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -49,8 +47,7 @@ function InputPage() {
       const logsId = match[1] || sanitizedInput; // 如果是纯日志 ID，直接使用输入值
       const fightId = match[2];
       if (logsId) {
-        const query = finalApiKey ? `?apiKey=${finalApiKey}` : ''; // 将 apiKey 添加到查询参数
-        navigate(fightId ? `/${logsId}/${fightId}${query}` : `/${logsId}${query}`);
+        navigate(fightId ? `/${finalApiKey}/${logsId}/${fightId}` : `/${finalApiKey}/${logsId}`);
       }
     } else {
       alert('输入的 FFLogs 链接或日志 ID 格式无效');
@@ -58,8 +55,7 @@ function InputPage() {
   };
 
   const generateBookmarkLink = () => {
-    const currentUrl = window.location.origin + window.location.pathname;
-    return `${currentUrl}?apiKey=${apiKey}`;
+    return `${window.location.origin}/fflogs_phase_ranker/#/${apiKey}`;
   };
 
   return (

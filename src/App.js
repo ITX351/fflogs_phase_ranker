@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles/global.css';
 import InputPage from './components/InputPage';
@@ -7,12 +7,13 @@ import Footer from './components/Footer';
 
 function App() {
   return (
-    <Router basename="/fflogs_phase_ranker">
+    <Router>
       <div className="App">
         <Routes>
           <Route path="/" element={<InputPage />} />
-          <Route path="/:logsId" element={<ResultPage />} />
-          <Route path="/:logsId/:fightId" element={<ResultPage />} />
+          <Route path="/:apiKey" element={<InputPage />} />
+          <Route path="/:apiKey/:logsId" element={<ResultPage />} />
+          <Route path="/:apiKey/:logsId/:fightId" element={<ResultPage />} />
         </Routes>
         <Footer />
       </div>

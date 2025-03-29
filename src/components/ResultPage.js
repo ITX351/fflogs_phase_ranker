@@ -4,7 +4,7 @@ import { fetchLogData, fetchDamageDoneData } from '../api/fflogsApi';
 import { getConfigItemsByRaid, updateDamageData } from '../api/dataProcessor';
 
 function ResultPage() {
-  const { logsId, fightId } = useParams();
+  const { apiKey, logsId, fightId } = useParams(); // 从路由参数中获取 apiKey
   const navigate = useNavigate();
   const [logData, setLogData] = useState(null);
   const [selectedFightId, setSelectedFightId] = useState(fightId || null);
@@ -17,7 +17,6 @@ function ResultPage() {
   useEffect(() => {
     async function loadLogData() {
       if (!logsId) return;
-      const apiKey = new URLSearchParams(window.location.search).get('apiKey') || '';
       try {
         const logData = await fetchLogData(logsId, apiKey);
         setLogData(logData);
@@ -25,7 +24,7 @@ function ResultPage() {
         if (fightId === "last" && logData.fights.length > 0) {
           const lastFightId = logData.fights[logData.fights.length - 1].id.toString();
           setSelectedFightId(lastFightId);
-          navigate(`/${logsId}/${lastFightId}?apiKey=${apiKey}`);
+          navigate(`/${apiKey}/${logsId}/${lastFightId}`);
         }
       } catch (error) {
         if (error instanceof Error) {
@@ -43,20 +42,18 @@ function ResultPage() {
       }
     }
     loadLogData();
-  }, [logsId, fightId, navigate]);
+  }, [logsId, fightId, apiKey, navigate]);
 
   useEffect(() => {
     async function loadDamageData() {
       if (!selectedFightId || !logData) return;
-      const apiKey = new URLSearchParams(window.location.search).get('apiKey') || ''; // 从 get 中获取 apiKey
       const fight = logData.fights.find(f => f.id === parseInt(selectedFightId));
       if (!fight) return;
 
       setLoading(true);
       const phaseData = {};
       for (const phase of fight.phases) {
-        //console.log('Fetching damage data for phase:', phase.id); // 调试信息
-        const damageData = await fetchDamageDoneData(logsId, apiKey, phase.startTime, phase.endTime); // 传入 apiKey
+        const damageData = await fetchDamageDoneData(logsId, apiKey, phase.startTime, phase.endTime);
         if (damageData) {
           const configItems = await getConfigItemsByRaid(fight.name, phase.id); // 异步调用 getConfigItemsByRaid
           if (configItems.length > 0) {
@@ -69,12 +66,11 @@ function ResultPage() {
       setLoading(false);
     }
     loadDamageData();
-  }, [selectedFightId, logData, logsId]);
+  }, [selectedFightId, logData, logsId, apiKey]);
 
   const handleFightClick = (id) => {
-    const apiKey = new URLSearchParams(window.location.search).get('apiKey') || ''; // 从 get 中获取 apiKey
     setSelectedFightId(id.toString());
-    navigate(`/${logsId}/${id}?apiKey=${apiKey}`);
+    navigate(`/${apiKey}/${logsId}/${id}`);
   };
 
   const handleMouseDown = (e) => {
@@ -116,10 +112,7 @@ function ResultPage() {
         <div className="d-flex align-items-center p-3">
           <button
             className="btn btn-link text-decoration-none"
-            onClick={() => {
-              const apiKey = new URLSearchParams(window.location.search).get('apiKey') || ''; // 获取 apiKey
-              navigate(`/?apiKey=${apiKey}`); // 将 apiKey 添加到导航路径
-            }}
+            onClick={() => navigate(`/${apiKey}`)} // 使用路由参数返回主页
             style={{ fontSize: '1.5rem' }}
             title="返回主页"
           >
