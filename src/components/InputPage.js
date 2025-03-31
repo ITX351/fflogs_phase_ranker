@@ -9,10 +9,21 @@ function InputPage() {
   const { apiKey: routeApiKey } = useParams(); // 从路由参数中获取 apiKey
 
   useEffect(() => {
+    const storedApiKey = localStorage.getItem('apiKey');
+    if (storedApiKey) {
+      setApiKey(storedApiKey);
+    }
     if (routeApiKey) {
-      setApiKey(routeApiKey); // 设置初始 apiKey
+      setApiKey(routeApiKey);
+      localStorage.setItem('apiKey', routeApiKey);
     }
   }, [routeApiKey]);
+
+  const handleApiKeyChange = (e) => {
+    const newApiKey = e.target.value;
+    setApiKey(newApiKey);
+    localStorage.setItem('apiKey', newApiKey);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -80,7 +91,7 @@ function InputPage() {
             id="apiKeyInput"
             className="form-control"
             value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
+            onChange={handleApiKeyChange}
             placeholder="请输入您的 API_KEY"
           />
           <button
