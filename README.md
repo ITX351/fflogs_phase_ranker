@@ -52,4 +52,5 @@ npm run build
 
 ---
 
-by ITX351（王离@延夏）
+感谢[leifeng桑](https://space.bilibili.com/8900735)的开发建议。  
+by [ITX351](https://space.bilibili.com/522021)（王离@延夏）
