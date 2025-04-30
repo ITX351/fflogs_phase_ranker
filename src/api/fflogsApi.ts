@@ -47,6 +47,7 @@ interface PlayerDamageData {
   totalADPS: number;
   totalNDPS: number;
   predictLogs: number;
+  jobNameCN: string;
 }
 
 interface DamageDoneData {
