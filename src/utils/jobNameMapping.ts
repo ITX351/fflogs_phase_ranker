@@ -1,0 +1,25 @@
+const jobNameMapping: Record<string, string> = {
+  "Pictomancer": "绘灵法师",
+  "Monk": "武僧",
+  "Dragoon": "龙骑士",
+  "Ninja": "忍者",
+  "Bard": "吟游诗人",
+  "Viper": "蝰蛇剑士",
+  "Samurai": "武士",
+  "BlackMage": "黑魔法师",
+  "Reaper": "钐镰客",
+  "Dancer": "舞者",
+  "RedMage": "赤魔法师",
+  "Summoner": "召唤师",
+  "Machinist": "机工士",
+  "Paladin": "骑士",
+  "Warrior": "战士",
+  "Gunbreaker": "绝枪战士",
+  "DarkKnight": "暗黑骑士",
+  "Astrologian": "占星术士",
+  "Scholar": "学者",
+  "WhiteMage": "白魔法师",
+  "Sage": "贤者",
+};
+
+export default jobNameMapping;
