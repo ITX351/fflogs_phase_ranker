@@ -1,4 +1,5 @@
 import { DamageDoneData, fetchLogData, fetchDamageDoneData } from './fflogsApi';
+import jobNameMapping from '../utils/jobNameMapping';
 
 const logsId = process.env.REACT_APP_LOGS_ID || '';
 const apiKey = process.env.REACT_APP_API_KEY || '';
@@ -79,11 +80,8 @@ async function updateDamageData(
   
   damageData.players.forEach(player => {
     const rdps = player.totalRD / totalTime * 1000;
-    // const adps = player.totalAD / totalTime * 1000;
-    // const ndps = player.totalND / totalTime * 1000;
+    player.type = jobNameMapping[player.type] || player.type; // 转换为中文职业名
 
-    // console.log("csvTable", csvTable);
-    //console.log("Processing ", configItem.datasetName, totalTime, player.totalRD, rdps, player.name, player.type, configItem.calculationMode);
     const playerData = csvTable[player.type];
     player.totalRDPS = rdps;
     if (playerData) {
