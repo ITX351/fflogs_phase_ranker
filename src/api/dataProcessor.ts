@@ -80,7 +80,7 @@ async function updateDamageData(
   
   damageData.players.forEach(player => {
     const rdps = player.totalRD / totalTime * 1000;
-    player.type = jobNameMapping[player.type] || player.type; // 转换为中文职业名
+    player.jobNameCN = jobNameMapping[player.type] || player.type; // 转换为中文职业名
 
     const playerData = csvTable[player.type];
     player.totalRDPS = rdps;

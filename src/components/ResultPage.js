@@ -199,7 +199,7 @@ function ResultPage() {
                         {damageData.players.map(player => (
                           <tr key={player.id}>
                             <td>{player.name}</td>
-                            <td>{player.type}</td>
+                            <td>{player.jobNameCN}</td>
                             <td style={{ color: getLogColor(player.predictLogs) }}>
                               {player.predictLogs === undefined
                                 ? '--'
