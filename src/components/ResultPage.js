@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchLogData, fetchDamageDoneData } from '../api/fflogsApi';
 import { getConfigItemsByRaid, updateDamageData } from '../api/dataProcessor';
+import { getLogColor } from '../utils/helpers';
 
 function ResultPage() {
   const { apiKey, logsId, fightId } = useParams(); // 从路由参数中获取 apiKey
@@ -9,10 +10,13 @@ function ResultPage() {
   const [logData, setLogData] = useState(null);
   const [selectedFightId, setSelectedFightId] = useState(fightId || null);
   const [phaseData, setPhaseData] = useState({});
+  const [phaseConfigItems, setPhaseConfigItems] = useState({}); // { phaseName: [configItem, ...] }
+  const [phaseSelectedDataset, setPhaseSelectedDataset] = useState({}); // { phaseName: configItem }
   const [loading, setLoading] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(250);
   const resizerRef = useRef(null);
   const [error, setError] = useState(null); // 新增状态用于存储错误信息
+  const [rawDamageData, setRawDamageData] = useState({}); // 新增：用于存储所有分P的原始damageData
 
   useEffect(() => {
     async function loadLogData() {
@@ -52,21 +56,52 @@ function ResultPage() {
 
       setLoading(true);
       const phaseData = {};
+      const phaseConfigItemsObj = {};
+      const phaseSelectedDatasetObj = {};
+      const phaseRawDamageData = {}; // 新增：存储每个分P的原始damageData
+
       for (const phase of fight.phases) {
-        const damageData = await fetchDamageDoneData(logsId, apiKey, phase.startTime, phase.endTime);
-        if (damageData) {
-          const configItems = await getConfigItemsByRaid(fight.name, phase.id); // 异步调用 getConfigItemsByRaid
-          if (configItems.length > 0) {
-            const effectiveDuration = await updateDamageData(damageData, configItems[0]); // 默认使用最新的配置项
-            phaseData[phase.name] = { damageData, effectiveDuration: effectiveDuration / 1000 }; // 转换为秒
+        const configItems = await getConfigItemsByRaid(fight.name, phase.id); // 异步调用 getConfigItemsByRaid
+        phaseConfigItemsObj[phase.name] = configItems;
+        if (configItems.length > 0) {
+          phaseSelectedDatasetObj[phase.name] = configItems[0]; // 默认选最新
+          const damageData = await fetchDamageDoneData(logsId, apiKey, phase.startTime, phase.endTime);
+          if (damageData) {
+            phaseRawDamageData[phase.name] = damageData; // 存储原始数据
+            const effectiveDuration = await updateDamageData(damageData, configItems[0]);
+            phaseData[phase.name] = { damageData, effectiveDuration: effectiveDuration / 1000 };
           }
         }
       }
+      setPhaseConfigItems(phaseConfigItemsObj);
+      setPhaseSelectedDataset(phaseSelectedDatasetObj);
       setPhaseData(phaseData);
+      setRawDamageData(phaseRawDamageData); // 新增：存储所有分P的原始damageData
       setLoading(false);
     }
     loadDamageData();
   }, [selectedFightId, logData, logsId, apiKey]);
+
+  // 切换数据集时，使用已存储的原始damageData
+  const handleDatasetChange = async (phaseName, configItem) => {
+    if (!selectedFightId || !logData) return;
+    if (!rawDamageData[phaseName]) return;
+    const damageData = JSON.parse(JSON.stringify(rawDamageData[phaseName])); // 深拷贝，避免污染原始数据
+    let effectiveDuration;
+    if (damageData) {
+      effectiveDuration = await updateDamageData(damageData, configItem);
+    }
+    setPhaseSelectedDataset(prev => ({
+      ...prev,
+      [phaseName]: configItem
+    }));
+    setPhaseData(prev => ({
+      ...prev,
+      [phaseName]: damageData
+        ? { damageData, effectiveDuration: effectiveDuration / 1000 }
+        : prev[phaseName]
+    }));
+  };
 
   const handleFightClick = (id) => {
     setSelectedFightId(id.toString());
@@ -87,16 +122,6 @@ function ResultPage() {
   const handleMouseUp = () => {
     document.removeEventListener('mousemove', handleMouseMove);
     document.removeEventListener('mouseup', handleMouseUp);
-  };
-
-  const getLogColor = (logs) => {
-    if (logs >= 99.5) return "#e5cc80";
-    if (logs >= 98.5) return "#e268a8";
-    if (logs >= 94.5) return "#ff8000";
-    if (logs >= 74.5) return "#a335ee";
-    if (logs >= 49.5) return "#0070ff";
-    if (logs >= 24.5) return "#1eff00";
-    return "#666";
   };
 
   return (
@@ -172,6 +197,34 @@ function ResultPage() {
             Object.keys(phaseData).length > 0 ? (
               Object.entries(phaseData).map(([phaseName, { damageData, effectiveDuration }]) => (
                 <div key={phaseName} className="mb-4">
+                  {/* 数据集选择下拉框 */}
+                  {phaseConfigItems[phaseName] && phaseConfigItems[phaseName].length > 0 && (
+                    <div className="mb-2">
+                      <label className="form-label me-2">数据集：</label>
+                      <select
+                        className="form-select d-inline-block"
+                        style={{ width: 320, maxWidth: '100%', display: 'inline-block' }}
+                        value={
+                          phaseSelectedDataset[phaseName]
+                            ? phaseSelectedDataset[phaseName].datasetName
+                            : phaseConfigItems[phaseName][0].datasetName
+                        }
+                        disabled={phaseConfigItems[phaseName].length === 1}
+                        onChange={e => {
+                          const selected = phaseConfigItems[phaseName].find(
+                            item => item.datasetName === e.target.value
+                          );
+                          if (selected) handleDatasetChange(phaseName, selected);
+                        }}
+                      >
+                        {phaseConfigItems[phaseName].map(item => (
+                          <option key={item.datasetName} value={item.datasetName}>
+                            {item.datasetName} ({item.creationDate})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
                   <h5>
                     {phaseName}
                     {effectiveDuration && (

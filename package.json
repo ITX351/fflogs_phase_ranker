@@ -1,6 +1,6 @@
 {
   "name": "fflogs_phase_ranker",
-  "version": "0.2.5",
+  "version": "0.3.0",
   "private": true,
   "homepage": "https://itx351.github.io/fflogs_phase_ranker",
   "dependencies": {
