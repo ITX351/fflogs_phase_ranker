@@ -119,6 +119,15 @@ function InputPage() {
         </div>
         <button type="submit" className="btn btn-primary w-100">跳转</button>
       </form>
+      <div className="mt-3 text-center">
+        <button
+          type="button"
+          className="btn btn-outline-info"
+          onClick={() => navigate('/dataset')}
+        >
+          浏览数据集
+        </button>
+      </div>
     </div>
   );
 }

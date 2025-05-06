@@ -1,6 +1,14 @@
 [
     {
-        "datasetName": "Eden's Promise Phase 1",
+        "datasetName": "国服伊甸P5",
+        "creationDate": "2025-05-07",
+        "raidMatchNames": ["Futures Rewritten"],
+        "raidLogsPhase": 5,
+        "dataFileName": "eden7.1p5_chn.csv",
+        "upperCombatTime": 273000
+    },
+    {
+        "datasetName": "国际服伊甸P1",
         "creationDate": "2025-03-14",
         "raidMatchNames": ["Futures Rewritten"],
         "raidLogsPhase": 1,
@@ -8,28 +16,28 @@
         "calculationMode": 1
     },
     {
-        "datasetName": "Eden's Promise Phase 2",
+        "datasetName": "国际服伊甸P2",
         "creationDate": "2025-03-16",
         "raidMatchNames": ["Futures Rewritten"],
         "raidLogsPhase": 2,
         "dataFileName": "eden7.1p2.csv"
     },
     {
-        "datasetName": "Eden's Promise Phase 3",
+        "datasetName": "国际服伊甸P3",
         "creationDate": "2025-03-16",
         "raidMatchNames": ["Futures Rewritten"],
         "raidLogsPhase": 3,
         "dataFileName": "eden7.1p3.csv"
     },
     {
-        "datasetName": "Eden's Promise Phase 4",
+        "datasetName": "国际服伊甸P4",
         "creationDate": "2025-03-17",
         "raidMatchNames": ["Futures Rewritten"],
         "raidLogsPhase": 4,
         "dataFileName": "eden7.1p4.csv"
     },
     {
-        "datasetName": "Eden's Promise Phase 5",
+        "datasetName": "国际服伊甸P5",
         "creationDate": "2025-02-28",
         "raidMatchNames": ["Futures Rewritten"],
         "raidLogsPhase": 5,
@@ -37,7 +45,7 @@
         "upperCombatTime": 273000
     },
     {
-        "datasetName": "Omega Protocol Phase 1",
+        "datasetName": "欧米茄P1",
         "creationDate": "2025-03-30",
         "raidMatchNames": ["The Omega Protocol"],
         "raidLogsPhase": 1,
@@ -45,35 +53,35 @@
         "calculationMode": 1
     },
     {
-        "datasetName": "Omega Protocol Phase 2",
+        "datasetName": "欧米茄P2",
         "creationDate": "2025-03-30",
         "raidMatchNames": ["The Omega Protocol"],
         "raidLogsPhase": 2,
         "dataFileName": "omega7.1p2.csv"
     },
     {
-        "datasetName": "Omega Protocol Phase 3",
+        "datasetName": "欧米茄P3",
         "creationDate": "2025-03-04",
         "raidMatchNames": ["The Omega Protocol"],
         "raidLogsPhase": 3,
         "dataFileName": "omega7.1p3.csv"
     },
     {
-        "datasetName": "Omega Protocol Phase 4",
+        "datasetName": "欧米茄P4",
         "creationDate": "2025-03-30",
         "raidMatchNames": ["The Omega Protocol"],
         "raidLogsPhase": 4,
         "dataFileName": "omega7.1p4.csv"
     },
     {
-        "datasetName": "Omega Protocol Phase 5",
+        "datasetName": "欧米茄P5",
         "creationDate": "2025-03-30",
         "raidMatchNames": ["The Omega Protocol"],
         "raidLogsPhase": 5,
         "dataFileName": "omega7.1p5.csv"
     },
     {
-        "datasetName": "Omega Protocol Phase 6",
+        "datasetName": "欧米茄P6",
         "creationDate": "2025-02-27",
         "raidMatchNames": ["The Omega Protocol"],
         "raidLogsPhase": 6,
