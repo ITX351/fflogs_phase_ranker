@@ -53,6 +53,7 @@ function ResultPage() {
       if (!selectedFightId || !logData) return;
       const fight = logData.fights.find(f => f.id === parseInt(selectedFightId));
       if (!fight) return;
+      if (loading) return;
 
       setLoading(true);
       const phaseData = {};
@@ -72,6 +73,7 @@ function ResultPage() {
             phaseData[phase.name] = { damageData, effectiveDuration: effectiveDuration / 1000 };
           }
         }
+        console.log(`Phase ${phase.name} loaded`);
       }
       setPhaseConfigItems(phaseConfigItemsObj);
       setPhaseSelectedDataset(phaseSelectedDatasetObj);
@@ -227,7 +229,7 @@ function ResultPage() {
                   )}
                   <h5>
                     {phaseName}
-                    {effectiveDuration && (
+                    {effectiveDuration > 0 && (
                       <span
                         className="text-muted ms-4"
                         style={{ fontSize: '0.9rem' }}
