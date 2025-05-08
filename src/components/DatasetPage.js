@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getLogColor } from '../utils/helpers';
 import jobNameMapping from '../utils/jobNameMapping';
 
@@ -12,6 +13,8 @@ function DatasetPage() {
   const [selectedDataset, setSelectedDataset] = useState(null);
   const [csvData, setCsvData] = useState([]);
   const [csvHeader, setCsvHeader] = useState([]);
+
+  const navigate = useNavigate();
 
   // 加载 config.json
   useEffect(() => {
@@ -67,26 +70,77 @@ function DatasetPage() {
   return (
     <div className="d-flex" style={{ minHeight: '80vh' }}>
       {/* 侧边栏 */}
-      <div style={{ width: 260, borderRight: '1px solid #ddd', background: '#f8f9fa' }}>
-        <div className="p-3 border-bottom">
-          <label className="form-label">副本：</label>
-          <select className="form-select mb-2"
-            value={selectedRaid}
-            onChange={e => setSelectedRaid(e.target.value)}
+      <div style={{ width: 260, borderRight: '1px solid #ddd', background: '#f8f9fa', position: 'relative' }}>
+        {/* 返回按钮，绝对定位在侧边栏左上角 */}
+        <button
+          className="btn btn-link text-decoration-none"
+          onClick={() => navigate('/')}
+          style={{
+            fontSize: '1.5rem',
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            zIndex: 10,
+            padding: '0.5rem 0.75rem'
+          }}
+          title="返回主页"
+        >
+          ⬅
+        </button>
+        {/* 用一个空div占位，把内容整体往下推 */}
+        <div style={{ height: '2.5rem' }}></div>
+        <div className="p-3 border-bottom" style={{ paddingLeft: '2.5rem' }}>
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              marginBottom: '0.5rem',
+              justifyContent: 'flex-end'
+            }}
           >
-            {raidNames.map(name => (
-              <option key={name} value={name}>{name}</option>
-            ))}
-          </select>
-          <label className="form-label">分P：</label>
-          <select className="form-select"
-            value={selectedPhase}
-            onChange={e => setSelectedPhase(Number(e.target.value))}
+            <label className="form-label mb-0" style={{ minWidth: 40, marginRight: '0.5rem' }}>副本：</label>
+            <select
+              className="form-select mb-0"
+              style={{
+                width: 160,
+                minWidth: 0,
+                maxWidth: '100%',
+                marginLeft: 'auto'
+              }}
+              value={selectedRaid}
+              onChange={e => setSelectedRaid(e.target.value)}
+            >
+              {raidNames.map(name => (
+                <option key={name} value={name}>{name}</option>
+              ))}
+            </select>
+          </div>
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              justifyContent: 'flex-end'
+            }}
           >
-            {phases.map(phase => (
-              <option key={phase} value={phase}>P{phase}</option>
-            ))}
-          </select>
+            <label className="form-label mb-0" style={{ minWidth: 40, marginRight: '0.5rem' }}>分P：</label>
+            <select
+              className="form-select mb-0"
+              style={{
+                width: 160,
+                minWidth: 0,
+                maxWidth: '100%',
+                marginLeft: 'auto'
+              }}
+              value={selectedPhase}
+              onChange={e => setSelectedPhase(Number(e.target.value))}
+            >
+              {phases.map(phase => (
+                <option key={phase} value={phase}>P{phase}</option>
+              ))}
+            </select>
+          </div>
         </div>
         <div className="p-2">
           <div className="fw-bold mb-2">数据集列表</div>
