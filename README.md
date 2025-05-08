@@ -17,18 +17,6 @@
 
 ---
 
-### 油猴脚本批量采集数据
-
-本项目提供油猴（Tampermonkey）脚本，可在 FFLogs 统计页面一键批量采集各分段职业数据并导出为 CSV 文件。
-
-**使用方法：**
-1. 安装 [Tampermonkey](https://www.tampermonkey.net/) 浏览器插件。
-2. 将 `tampermonkey_fflogs_dataset.js` 脚本添加到 Tampermonkey。
-3. 访问 FFlogs 网站的绝境战-数据统计页面（`https://cn.fflogs.com/zone/statistics/*`，注意包括class=Any才包括所有职业），页面右上角会出现“批量爬取分段数据”按钮。
-4. 点击按钮，等待自动采集并下载数据集 CSV 文件。
-
----
-
 ### 数据集展示
 
 - 点击首页下方的“浏览数据集”按钮，可进入数据集展示页面。
@@ -69,12 +57,6 @@ npm start
 ```sh
 npm run build
 ```
-
----
-
-### 协议
-
-本项目采用 [MIT License](./LICENSE) 开源协议，允许自由使用、修改和分发。详情请参见 LICENSE 文件。
 
 ---
 
