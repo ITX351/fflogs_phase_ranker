@@ -130,7 +130,9 @@ async function fetchDamageDoneData(logsIdParam: string, apiKeyParam: string, sta
   try {
     const response = await axios.get(url);
     const data = response.data;
-    const { totalTime, downtime = 0, combatTime } = data;
+    const { totalTime, downtime = 0, combatTime, damageDowntime = 0 } = data;
+
+    const effectiveDowntime = damageDowntime || downtime; // 优先使用 damageDowntime
 
     const players: PlayerDamageData[] = data.entries
       .filter((entry: any) => entry.type !== "LimitBreak") // 去除 type 为 "LimitBreak" 的项
@@ -143,13 +145,13 @@ async function fetchDamageDoneData(logsIdParam: string, apiKeyParam: string, sta
         totalRD: entry.totalRDPS,
         totalAD: entry.totalADPS,
         totalND: entry.totalNDPS,
-        totalRDPS: entry.totalRDPS / (totalTime - downtime) * 1000.,
-        totalADPS: entry.totalADPS / (totalTime - downtime) * 1000.,
-        totalNDPS: entry.totalNDPS / (totalTime - downtime) * 1000.,
+        totalRDPS: entry.totalRDPS / (totalTime - effectiveDowntime) * 1000.,
+        totalADPS: entry.totalADPS / (totalTime - effectiveDowntime) * 1000.,
+        totalNDPS: entry.totalNDPS / (totalTime - effectiveDowntime) * 1000.,
       }))
       .sort((a: { totalRD: number; }, b: { totalRD: number; }) => b.totalRD - a.totalRD); // 按 totalRD 降序排序
 
-    return { players, totalTime, downtime, combatTime };
+    return { players, totalTime, downtime: effectiveDowntime, combatTime };
   } catch (error) {
     console.error('Error fetching damage done data:', error);
     return null;
