@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getLogColor } from '../utils/helpers';
 import jobNameMapping from '../utils/jobNameMapping';
@@ -13,8 +13,28 @@ function DatasetPage() {
   const [selectedDataset, setSelectedDataset] = useState(null);
   const [csvData, setCsvData] = useState([]);
   const [csvHeader, setCsvHeader] = useState([]);
+  const [sortCol, setSortCol] = useState(null);
+  const [sidebarWidth, setSidebarWidth] = useState(260); // 默认宽度
+  const resizerRef = useRef(null);
 
   const navigate = useNavigate();
+
+  // 拖拽相关事件
+  const handleMouseDown = (e) => {
+    e.preventDefault();
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
+
+  const handleMouseMove = (e) => {
+    const newWidth = Math.min(600, Math.max(150, e.clientX)); // 限制宽度
+    setSidebarWidth(newWidth);
+  };
+
+  const handleMouseUp = () => {
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', handleMouseUp);
+  };
 
   // 加载 config.json
   useEffect(() => {
@@ -64,13 +84,36 @@ function DatasetPage() {
         const rows = lines.slice(1).map(line => line.split(','));
         setCsvHeader(header);
         setCsvData(rows);
+        // 默认按75分段降序排序
+        const idx75 = header.indexOf('75');
+        setSortCol(idx75 > 0 ? idx75 : null);
       });
   }, [selectedDataset]);
+
+  // 处理排序
+  const getSortedData = () => {
+    if (sortCol == null || csvData.length === 0) return csvData;
+    // 只对数值列排序
+    if (sortCol === 0) return csvData; // 第一列为职业名，不排序
+    return [...csvData].sort((a, b) => {
+      const va = Number(a[sortCol]) || 0;
+      const vb = Number(b[sortCol]) || 0;
+      return vb - va; // 降序
+    });
+  };
 
   return (
     <div className="d-flex" style={{ minHeight: '80vh' }}>
       {/* 侧边栏 */}
-      <div style={{ width: 260, borderRight: '1px solid #ddd', background: '#f8f9fa', position: 'relative' }}>
+      <div
+        style={{
+          width: sidebarWidth,
+          borderRight: '1px solid #ddd',
+          background: '#f8f9fa',
+          position: 'relative',
+          overflowY: 'auto'
+        }}
+      >
         {/* 返回按钮，绝对定位在侧边栏左上角 */}
         <button
           className="btn btn-link text-decoration-none"
@@ -156,6 +199,16 @@ function DatasetPage() {
           ))}
         </div>
       </div>
+      {/* 拖拽条 */}
+      <div
+        ref={resizerRef}
+        style={{
+          width: '5px',
+          cursor: 'col-resize',
+          backgroundColor: '#ddd',
+        }}
+        onMouseDown={handleMouseDown}
+      ></div>
       {/* 主体内容 */}
       <div className="flex-grow-1 p-4">
         {selectedDataset ? (
@@ -176,16 +229,22 @@ function DatasetPage() {
                         return (
                           <th
                             key={idx}
-                            style={isNum ? { color: getLogColor(num) } : undefined}
+                            style={isNum ? { color: getLogColor(num), cursor: 'pointer' } : { cursor: 'default' }}
+                            onClick={() => {
+                              if (isNum) setSortCol(idx);
+                            }}
                           >
                             {idx === 0 && col === 'Key' ? 'Rdps' : col}
+                            {isNum && sortCol === idx && (
+                              <span style={{ marginLeft: 4 }}>▼</span>
+                            )}
                           </th>
                         );
                       })}
                     </tr>
                   </thead>
                   <tbody>
-                    {csvData.map((row, i) => (
+                    {getSortedData().map((row, i) => (
                       <tr key={i}>
                         {row.map((cell, j) => {
                           // 第一列为职业英文名，转中文
