@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         FFLogs Dataset Batch Fetcher
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      0.2
 // @description  自动批量爬取FFLogs各分段数据并导出为CSV
 // @author       ITX351
-// @match        https://cn.fflogs.com/zone/statistics/*
+// @match        https://*.fflogs.com/zone/statistics/*
 // @grant        none
 // ==/UserScript==
 
@@ -117,8 +117,18 @@
         // 生成CSV
         // 按分段顺序输出
         const header = ['Key', ...segKeys];
+        // 按logs75分段降序排序职业
+        let sortedJobs = allJobs;
+        if (segKeys.includes('75')) {
+            sortedJobs = allJobs.slice().sort((a, b) => {
+                // 转为数字比较，空值视为0
+                const dpsA = Number(jobData[a]?.['75'] || 0);
+                const dpsB = Number(jobData[b]?.['75'] || 0);
+                return dpsB - dpsA;
+            });
+        }
         const lines = [header.join(',')];
-        for (const job of allJobs) {
+        for (const job of sortedJobs) {
             const row = [job];
             for (const seg of segKeys) {
                 row.push(jobData[job]?.[seg] || '');

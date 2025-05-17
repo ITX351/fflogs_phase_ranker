@@ -155,24 +155,44 @@ function ResultPage() {
             const seconds = duration % 60;
             const formattedDuration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
             const textColor = fight.kill ? 'text-success' : 'text-danger';
+            const fightUrl = `/fflogs_phase_ranker/#/${apiKey}/${logsId}/${fight.id}`;
 
             return (
-              <div
+              <a
                 key={fight.id}
-                className="p-2"
+                href={fightUrl}
                 style={{
-                  cursor: 'pointer',
-                  backgroundColor: selectedFightId === fight.id.toString() ? '#b3e5fc' : 'transparent', // 蓝色底色
-                  fontWeight: selectedFightId === fight.id.toString() ? 'bold' : 'normal', // 加粗字体
-                  boxShadow: selectedFightId === fight.id.toString() ? '0px 4px 6px rgba(0, 0, 0, 0.1)' : 'none', // 浮雕效果
-                  borderRadius: selectedFightId === fight.id.toString() ? '4px' : '0', // 圆角
+                  textDecoration: 'none',
+                  color: 'inherit',
                 }}
-                onClick={() => handleFightClick(fight.id)}
+                onClick={e => {
+                  // 只处理左键点击，右键/中键不拦截
+                  if (
+                    !e.ctrlKey &&
+                    !e.metaKey &&
+                    !e.shiftKey &&
+                    e.button === 0
+                  ) {
+                    e.preventDefault();
+                    handleFightClick(fight.id);
+                  }
+                }}
               >
-                <span className={textColor}>
-                  {fight.name} ({fight.id}) {formattedDuration}
-                </span>
-              </div>
+                <div
+                  className="p-2"
+                  style={{
+                    cursor: 'pointer',
+                    backgroundColor: selectedFightId === fight.id.toString() ? '#b3e5fc' : 'transparent', // 蓝色底色
+                    fontWeight: selectedFightId === fight.id.toString() ? 'bold' : 'normal', // 加粗字体
+                    boxShadow: selectedFightId === fight.id.toString() ? '0px 4px 6px rgba(0, 0, 0, 0.1)' : 'none', // 浮雕效果
+                    borderRadius: selectedFightId === fight.id.toString() ? '4px' : '0', // 圆角
+                  }}
+                >
+                  <span className={textColor}>
+                    {fight.name} ({fight.id}) {formattedDuration}
+                  </span>
+                </div>
+              </a>
             );
           })
         ) : (

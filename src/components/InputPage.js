@@ -122,7 +122,14 @@ function InputPage() {
       <div className="mt-3 text-center">
         <button
           type="button"
-          className="btn btn-outline-info"
+          className="btn"
+          style={{
+            backgroundColor: '#ffd700',
+            color: '#222',
+            fontWeight: 'bold',
+            border: '2px solid #ffb800',
+            boxShadow: '0 2px 8px rgba(255,215,0,0.15)'
+          }}
           onClick={() => navigate('/dataset')}
         >
           浏览数据集

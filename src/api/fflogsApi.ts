@@ -2,6 +2,7 @@ import axios from 'axios';
 
 const logsId = process.env.REACT_APP_LOGS_ID || '';
 const apiKey = process.env.REACT_APP_API_KEY || '';
+const domain = process.env.REACT_APP_DOMAIN || 'www.fflogs.com';
 
 interface Phase {
   startTime: number;
@@ -65,7 +66,7 @@ async function fetchLogData(logsIdParam: string, apiKeyParam: string): Promise<L
     throw new Error('缺少 logsId 或 apiKey');
   }
 
-  const fightsUrl = `https://cn.fflogs.com/v1/report/fights/${logsIdToUse}?api_key=${apiKeyToUse}`;
+  const fightsUrl = `https://${domain}/v1/report/fights/${logsIdToUse}?api_key=${apiKeyToUse}`;
   console.log('Fetching log data from:', fightsUrl);
 
   try {
@@ -124,7 +125,7 @@ async function fetchDamageDoneData(logsIdParam: string, apiKeyParam: string, sta
     throw new Error('缺少 logsId 或 apiKey');
   }
 
-  const url = `https://cn.fflogs.com/v1/report/tables/damage-done/${logsIdToUse}?api_key=${apiKeyToUse}&start=${start}&end=${end}`;
+  const url = `https://${domain}/v1/report/tables/damage-done/${logsIdToUse}?api_key=${apiKeyToUse}&start=${start}&end=${end}`;
   console.log('Fetching damage done data from:', url);
 
   try {
