@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getLogColor } from '../utils/helpers';
 import jobNameMapping from '../utils/jobNameMapping';
+import { loadConfig } from '../api/dataProcessor';
 
 function DatasetPage() {
   const [config, setConfig] = useState([]);
@@ -36,17 +37,15 @@ function DatasetPage() {
     document.removeEventListener('mouseup', handleMouseUp);
   };
 
-  // 加载 config.json
+  // 加载 config.json（改为调用loadConfig）
   useEffect(() => {
-    fetch('/fflogs_phase_ranker/data/config.json')
-      .then(res => res.json())
-      .then(data => {
-        setConfig(data);
-        // 提取所有唯一raidMatchNames
-        const raids = Array.from(new Set(data.flatMap(item => item.raidMatchNames)));
-        setRaidNames(raids);
-        if (raids.length > 0) setSelectedRaid(raids[0]);
-      });
+    loadConfig().then(data => {
+      setConfig(data);
+      // 提取所有唯一raidMatchNames
+      const raids = Array.from(new Set(data.flatMap(item => item.raidMatchNames)));
+      setRaidNames(raids);
+      if (raids.length > 0) setSelectedRaid(raids[0]);
+    });
   }, []);
 
   // 根据选中的raid，提取所有phase
@@ -63,7 +62,7 @@ function DatasetPage() {
     if (!selectedRaid || !selectedPhase) return;
     const filtered = config.filter(
       item => item.raidMatchNames.includes(selectedRaid) && item.raidLogsPhase === selectedPhase
-    );
+    ).sort((a, b) => new Date(b.creationDate) - new Date(a.creationDate));
     setDatasets(filtered);
     setSelectedDataset(filtered.length > 0 ? filtered[0] : null);
   }, [selectedRaid, selectedPhase, config]);

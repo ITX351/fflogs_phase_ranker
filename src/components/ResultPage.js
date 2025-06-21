@@ -218,13 +218,20 @@ function ResultPage() {
             Object.keys(phaseData).length > 0 ? (
               Object.entries(phaseData).map(([phaseName, { damageData, effectiveDuration }]) => (
                 <div key={phaseName} className="mb-4">
-                  {/* 数据集选择下拉框 */}
-                  {phaseConfigItems[phaseName] && phaseConfigItems[phaseName].length > 0 && (
-                    <div className="mb-2">
-                      <label className="form-label me-2">数据集：</label>
+                  <h5>
+                    {phaseName}
+                    {effectiveDuration > 0 && (
+                      <span
+                        className="text-muted ms-4"
+                        style={{ fontSize: '0.9rem' }}
+                      >
+                        {effectiveDuration.toFixed(2)}秒
+                      </span>
+                    )}
+                    {phaseConfigItems[phaseName] && phaseConfigItems[phaseName].length > 0 && (
                       <select
-                        className="form-select d-inline-block"
-                        style={{ width: 320, maxWidth: '100%', display: 'inline-block' }}
+                        className="form-select d-inline-block ms-3"
+                        style={{ width: 320, maxWidth: '100%', display: 'inline-block', verticalAlign: 'middle' }}
                         value={
                           phaseSelectedDataset[phaseName]
                             ? phaseSelectedDataset[phaseName].datasetName
@@ -244,17 +251,6 @@ function ResultPage() {
                           </option>
                         ))}
                       </select>
-                    </div>
-                  )}
-                  <h5>
-                    {phaseName}
-                    {effectiveDuration > 0 && (
-                      <span
-                        className="text-muted ms-4"
-                        style={{ fontSize: '0.9rem' }}
-                      >
-                        {effectiveDuration.toFixed(2)}秒
-                      </span>
                     )}
                   </h5>
                   {damageData && damageData.players && damageData.players.length > 0 ? (
