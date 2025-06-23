@@ -129,7 +129,8 @@
         "creationDate": "2025-05-08",
         "raidMatchNames": ["Dragonsong's Reprise"],
         "raidLogsPhase": 2,
-        "dataFileName": "dsr7.1p2.csv"
+        "dataFileName": "dsr7.1p2.csv",
+        "calculationMode": 1
     },
     {
         "datasetName": "7.1龙诗P3",

@@ -15,17 +15,34 @@ interface ConfigItem {
 }
 
 const pathPrefix = '/fflogs_phase_ranker/data/';
-const configFilePath = pathPrefix + 'config.json';
 
 /**
- * 读取 config.json 文件并返回数据项
+ * 读取 config_file_list.json 文件，整合所有配置文件内容
  */
 async function loadConfig(): Promise<ConfigItem[]> {
-  const response = await fetch(configFilePath);
-  if (!response.ok) {
-    throw new Error(`Failed to load config.json: ${response.statusText}`);
+  const configListPath = pathPrefix + 'config_file_list.json';
+  const listResponse = await fetch(configListPath);
+  if (!listResponse.ok) {
+    throw new Error(`Failed to load config_file_list.json: ${listResponse.statusText}`);
   }
-  return response.json() as Promise<ConfigItem[]>;
+  const configList: { version: string; fileName: string }[] = await listResponse.json();
+  const allConfigs: ConfigItem[][] = await Promise.all(
+    configList.map(async (item) => {
+      const filePath = pathPrefix + item.version + '/' + item.fileName;
+      const resp = await fetch(filePath);
+      if (!resp.ok) {
+        throw new Error(`Failed to load ${filePath}: ${resp.statusText}`);
+      }
+      const configs: ConfigItem[] = await resp.json();
+      configs.forEach(config => {
+        if (config.dataFileName && !config.dataFileName.startsWith(item.version + '/')) {
+          config.dataFileName = item.version + '/' + config.dataFileName;
+        }
+      });
+      return configs;
+    })
+  );
+  return allConfigs.flat();
 }
 
 /**
@@ -154,4 +171,4 @@ if (require.main === module) {
   main();
 }
 
-export { getConfigItemsByRaid, updateDamageData };
+export { loadConfig, getConfigItemsByRaid, updateDamageData };
