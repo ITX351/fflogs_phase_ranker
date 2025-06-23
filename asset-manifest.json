@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/fflogs_phase_ranker/static/css/main.ca97c6a7.css",
-    "main.js": "/fflogs_phase_ranker/static/js/main.6a4b5fd5.js",
-    "static/js/453.8e6970cb.chunk.js": "/fflogs_phase_ranker/static/js/453.8e6970cb.chunk.js",
+    "main.css": "/fflogs_phase_ranker/static/css/main.4ecc6cb8.css",
+    "main.js": "/fflogs_phase_ranker/static/js/main.3f7c50d2.js",
+    "static/js/453.2f696920.chunk.js": "/fflogs_phase_ranker/static/js/453.2f696920.chunk.js",
     "index.html": "/fflogs_phase_ranker/index.html",
-    "main.ca97c6a7.css.map": "/fflogs_phase_ranker/static/css/main.ca97c6a7.css.map",
-    "main.6a4b5fd5.js.map": "/fflogs_phase_ranker/static/js/main.6a4b5fd5.js.map",
-    "453.8e6970cb.chunk.js.map": "/fflogs_phase_ranker/static/js/453.8e6970cb.chunk.js.map"
+    "main.4ecc6cb8.css.map": "/fflogs_phase_ranker/static/css/main.4ecc6cb8.css.map",
+    "main.3f7c50d2.js.map": "/fflogs_phase_ranker/static/js/main.3f7c50d2.js.map",
+    "453.2f696920.chunk.js.map": "/fflogs_phase_ranker/static/js/453.2f696920.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.ca97c6a7.css",
-    "static/js/main.6a4b5fd5.js"
+    "static/css/main.4ecc6cb8.css",
+    "static/js/main.3f7c50d2.js"
   ]
 }
