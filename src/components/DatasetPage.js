@@ -3,6 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { getLogColor } from '../utils/helpers';
 import jobNameMapping from '../utils/jobNameMapping';
 import { loadConfig } from '../api/dataProcessor';
+import { 
+  MOBILE_BREAKPOINT, 
+  SIDEBAR_DEFAULT_WIDTH, 
+  SIDEBAR_MIN_WIDTH, 
+  SIDEBAR_MAX_WIDTH 
+} from '../utils/constants';
 
 function DatasetPage() {
   const [config, setConfig] = useState([]);
@@ -15,10 +21,21 @@ function DatasetPage() {
   const [csvData, setCsvData] = useState([]);
   const [csvHeader, setCsvHeader] = useState([]);
   const [sortCol, setSortCol] = useState(null);
-  const [sidebarWidth, setSidebarWidth] = useState(260); // 默认宽度
+  const [sidebarWidth, setSidebarWidth] = useState(SIDEBAR_DEFAULT_WIDTH);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < MOBILE_BREAKPOINT);
   const resizerRef = useRef(null);
 
   const navigate = useNavigate();
+
+  // 监听窗口大小变化
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // 拖拽相关事件
   const handleMouseDown = (e) => {
@@ -28,7 +45,7 @@ function DatasetPage() {
   };
 
   const handleMouseMove = (e) => {
-    const newWidth = Math.min(600, Math.max(150, e.clientX)); // 限制宽度
+    const newWidth = Math.min(SIDEBAR_MAX_WIDTH, Math.max(SIDEBAR_MIN_WIDTH, e.clientX));
     setSidebarWidth(newWidth);
   };
 
@@ -102,115 +119,176 @@ function DatasetPage() {
   };
 
   return (
-    <div className="d-flex" style={{ minHeight: '80vh' }}>
-      {/* 侧边栏 */}
-      <div
-        style={{
-          width: sidebarWidth,
-          borderRight: '1px solid #ddd',
-          background: '#f8f9fa',
-          position: 'relative',
-          overflowY: 'auto'
-        }}
-      >
-        {/* 返回按钮，绝对定位在侧边栏左上角 */}
-        <button
-          className="btn btn-link text-decoration-none"
-          onClick={() => navigate('/')}
+    <div style={{ minHeight: '80vh' }}>
+      {/* 手机端返回按钮 - 只在小屏幕显示 */}
+      {isMobile && (
+        <div className="p-2" style={{ background: '#f8f9fa', borderBottom: '1px solid #ddd' }}>
+          <button
+            className="btn btn-link text-decoration-none p-1"
+            onClick={() => navigate('/')}
+            style={{ fontSize: '1.5rem' }}
+            title="返回主页"
+          >
+            ⬅
+          </button>
+        </div>
+      )}
+
+      {/* 响应式容器 */}
+      <div className={isMobile ? "d-flex flex-column" : "d-flex"}>
+        {/* 侧边栏 - 在小屏幕上显示在顶部，大屏幕上显示在左侧 */}
+        <div
+          className="d-flex flex-column"
           style={{
-            fontSize: '1.5rem',
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            zIndex: 10,
-            padding: '0.5rem 0.75rem'
+            width: isMobile ? '100%' : `${sidebarWidth}px`, // 确保使用px单位
+            minWidth: isMobile ? 'auto' : `${SIDEBAR_MIN_WIDTH}px`,
+            maxWidth: isMobile ? '100%' : `${SIDEBAR_MAX_WIDTH}px`,
+            borderRight: isMobile ? 'none' : '1px solid #ddd',
+            borderBottom: isMobile ? '1px solid #ddd' : 'none',
+            background: '#f8f9fa',
+            position: 'relative',
+            overflowY: 'auto',
+            maxHeight: isMobile ? 'none' : '80vh',
+            flexShrink: 0 // 防止侧边栏被压缩
           }}
-          title="返回主页"
         >
-          ⬅
-        </button>
-        {/* 用一个空div占位，把内容整体往下推 */}
-        <div style={{ height: '2.5rem' }}></div>
-        <div className="p-3 border-bottom" style={{ paddingLeft: '2.5rem' }}>
-          <div
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              alignItems: 'center',
-              marginBottom: '0.5rem',
-              justifyContent: 'flex-end'
-            }}
-          >
-            <label className="form-label mb-0" style={{ minWidth: 40, marginRight: '0.5rem' }}>副本：</label>
-            <select
-              className="form-select mb-0"
+          {/* 电脑端返回按钮 - 只在大屏幕显示，绝对定位在侧边栏左上角 */}
+          {!isMobile && (
+            <button
+              className="btn btn-link text-decoration-none"
+              onClick={() => navigate('/')}
               style={{
-                width: 160,
-                minWidth: 0,
-                maxWidth: '100%',
-                marginLeft: 'auto'
+                fontSize: '1.5rem',
+                position: 'absolute',
+                left: 0,
+                top: 0,
+                zIndex: 10,
+                padding: '0.5rem 0.75rem'
               }}
-              value={selectedRaid}
-              onChange={e => setSelectedRaid(e.target.value)}
+              title="返回主页"
             >
-              {raidNames.map(name => (
-                <option key={name} value={name}>{name}</option>
-              ))}
-            </select>
-          </div>
-          <div
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              alignItems: 'center',
-              justifyContent: 'flex-end'
-            }}
-          >
-            <label className="form-label mb-0" style={{ minWidth: 40, marginRight: '0.5rem' }}>分P：</label>
-            <select
-              className="form-select mb-0"
-              style={{
-                width: 160,
-                minWidth: 0,
-                maxWidth: '100%',
-                marginLeft: 'auto'
-              }}
-              value={selectedPhase}
-              onChange={e => setSelectedPhase(Number(e.target.value))}
-            >
-              {phases.map(phase => (
-                <option key={phase} value={phase}>P{phase}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-        <div className="p-2">
-          <div className="fw-bold mb-2">数据集列表</div>
-          {datasets.map(ds => (
-            <div
-              key={ds.datasetName}
-              className={`p-2 mb-1 rounded ${selectedDataset && ds.datasetName === selectedDataset.datasetName ? 'bg-info text-white' : 'bg-light'}`}
-              style={{ cursor: 'pointer' }}
-              onClick={() => setSelectedDataset(ds)}
-            >
-              {ds.datasetName} <span className="text-muted" style={{ fontSize: '0.9em' }}>({ds.creationDate})</span>
+              ⬅
+            </button>
+          )}
+          
+          {/* 用一个空div占位，把内容整体往下推 - 只在大屏幕需要 */}
+          {!isMobile && <div style={{ height: '2.5rem' }}></div>}
+
+          {/* 控制区域 */}
+          <div className="p-3" style={{ 
+            borderBottom: '1px solid #ddd',
+            paddingLeft: isMobile ? '1rem' : '2.5rem' // 大屏幕需要给返回按钮留空间
+          }}>
+            {/* 在小屏幕上横向排列选择器，大屏幕恢复原始样式 */}
+            <div className={isMobile ? 'd-flex flex-wrap gap-3' : ''}>
+              <div className={isMobile ? 'flex-fill' : 'mb-3'}>
+                <div style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  alignItems: 'center',
+                  marginBottom: isMobile ? '0' : '0.5rem',
+                  justifyContent: isMobile ? 'flex-start' : 'flex-end'
+                }}>
+                  <label className="form-label mb-0" style={{ minWidth: 40, marginRight: '0.5rem' }}>副本：</label>
+                  <select
+                    className="form-select mb-0"
+                    style={isMobile ? { flex: 1 } : {
+                      width: 160,
+                      minWidth: 0,
+                      maxWidth: '100%',
+                      marginLeft: 'auto'
+                    }}
+                    value={selectedRaid}
+                    onChange={e => setSelectedRaid(e.target.value)}
+                  >
+                    {raidNames.map(name => (
+                      <option key={name} value={name}>{name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className={isMobile ? 'flex-fill' : ''}>
+                <div style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  alignItems: 'center',
+                  justifyContent: isMobile ? 'flex-start' : 'flex-end'
+                }}>
+                  <label className="form-label mb-0" style={{ minWidth: 40, marginRight: '0.5rem' }}>分P：</label>
+                  <select
+                    className="form-select mb-0"
+                    style={isMobile ? { flex: 1 } : {
+                      width: 160,
+                      minWidth: 0,
+                      maxWidth: '100%',
+                      marginLeft: 'auto'
+                    }}
+                    value={selectedPhase}
+                    onChange={e => setSelectedPhase(Number(e.target.value))}
+                  >
+                    {phases.map(phase => (
+                      <option key={phase} value={phase}>P{phase}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
             </div>
-          ))}
+          </div>
+
+          {/* 数据集列表 */}
+          <div className="p-2 flex-grow-1">
+            <div className="fw-bold mb-2">数据集列表</div>
+            {/* 在小屏幕上使用下拉选择，大屏幕上使用列表 */}
+            {isMobile ? (
+              <select
+                className="form-select"
+                value={selectedDataset?.datasetName || ''}
+                onChange={e => {
+                  const selected = datasets.find(ds => ds.datasetName === e.target.value);
+                  setSelectedDataset(selected || null);
+                }}
+              >
+                <option value="">请选择数据集</option>
+                {datasets.map(ds => (
+                  <option key={ds.datasetName} value={ds.datasetName}>
+                    {ds.datasetName} ({ds.creationDate})
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                {datasets.map(ds => (
+                  <div
+                    key={ds.datasetName}
+                    className={`p-2 mb-1 rounded ${selectedDataset && ds.datasetName === selectedDataset.datasetName ? 'bg-info text-white' : 'bg-light'}`}
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => setSelectedDataset(ds)}
+                  >
+                    {ds.datasetName} <span className="text-muted" style={{ fontSize: '0.9em' }}>({ds.creationDate})</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-      {/* 拖拽条 */}
-      <div
-        ref={resizerRef}
-        style={{
-          width: '5px',
-          cursor: 'col-resize',
-          backgroundColor: '#ddd',
-        }}
-        onMouseDown={handleMouseDown}
-      ></div>
-      {/* 主体内容 */}
-      <div className="flex-grow-1 p-4">
-        {selectedDataset ? (
+
+        {/* 拖拽条 - 只在大屏幕上显示 */}
+        {!isMobile && (
+          <div
+            ref={resizerRef}
+            style={{
+              width: '5px',
+              cursor: 'col-resize',
+              backgroundColor: '#ddd',
+              flexShrink: 0 // 防止拖拽条被压缩
+            }}
+            onMouseDown={handleMouseDown}
+          ></div>
+        )}
+
+        {/* 主体内容 */}
+        <div className="flex-grow-1 p-4">
+          {selectedDataset ? (
           <>
             <h4>
               {selectedDataset.datasetName}
@@ -265,9 +343,10 @@ function DatasetPage() {
               )}
             </div>
           </>
-        ) : (
-          <div>请选择数据集</div>
-        )}
+          ) : (
+            <div>请选择数据集</div>
+          )}
+        </div>
       </div>
     </div>
   );

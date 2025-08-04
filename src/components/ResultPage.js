@@ -3,17 +3,35 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { fetchLogData, fetchDamageDoneData } from '../api/fflogsApi';
 import { getConfigItemsByRaid, updateDamageData } from '../api/dataProcessor';
 import { getLogColor } from '../utils/helpers';
+import { 
+  MOBILE_BREAKPOINT, 
+  SIDEBAR_DEFAULT_WIDTH, 
+  SIDEBAR_MIN_WIDTH, 
+  SIDEBAR_MAX_WIDTH 
+} from '../utils/constants';
 
 function ResultPage() {
   const { apiKey, logsId, fightId } = useParams(); // 从路由参数中获取 apiKey
   const navigate = useNavigate();
+
+  // 监听窗口大小变化
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   const [logData, setLogData] = useState(null);
   const [selectedFightId, setSelectedFightId] = useState(fightId || null);
   const [phaseData, setPhaseData] = useState({});
   const [phaseConfigItems, setPhaseConfigItems] = useState({}); // { phaseName: [configItem, ...] }
   const [phaseSelectedDataset, setPhaseSelectedDataset] = useState({}); // { phaseName: configItem }
   const [loading, setLoading] = useState(false);
-  const [sidebarWidth, setSidebarWidth] = useState(250);
+  const [sidebarWidth, setSidebarWidth] = useState(SIDEBAR_DEFAULT_WIDTH);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < MOBILE_BREAKPOINT);
+  const [fightListExpanded, setFightListExpanded] = useState(false); // 手机端战斗列表折叠状态
   const resizerRef = useRef(null);
   const [error, setError] = useState(null); // 新增状态用于存储错误信息
   const [rawDamageData, setRawDamageData] = useState({}); // 新增：用于存储所有分P的原始damageData
@@ -116,7 +134,7 @@ function ResultPage() {
   };
 
   const handleMouseMove = (e) => {
-    const newWidth = Math.min(600, Math.max(150, e.clientX)); // 最小宽度为 150px，最大宽度为 400px
+    const newWidth = Math.min(SIDEBAR_MAX_WIDTH, Math.max(SIDEBAR_MIN_WIDTH, e.clientX));
     setSidebarWidth(newWidth);
   };
 
@@ -126,178 +144,284 @@ function ResultPage() {
   };
 
   return (
-    <div className="d-flex">
-      <div
-        className="sidebar"
-        style={{
-          width: `${sidebarWidth}px`,
-          overflowY: 'auto',
-          borderRight: '1px solid #ddd',
-        }}
-      >
-        <div className="d-flex align-items-center p-3">
-          <button
-            className="btn btn-link text-decoration-none"
-            onClick={() => navigate(`/${apiKey}`)} // 使用路由参数返回主页
-            style={{ fontSize: '1.5rem' }}
-            title="返回主页"
-          >
-            ⬅
-          </button>
-          <h4 className="ms-2 mb-0">战斗列表</h4>
-        </div>
-        {logData ? (
-          logData.fights.map(fight => {
-            const duration = fight.end_time && fight.start_time
-              ? Math.floor((fight.end_time - fight.start_time) / 1000) // 转换为秒
-              : 0;
-            const minutes = Math.floor(duration / 60);
-            const seconds = duration % 60;
-            const formattedDuration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-            const textColor = fight.kill ? 'text-success' : 'text-danger';
-            const fightUrl = `/fflogs_phase_ranker/#/${apiKey}/${logsId}/${fight.id}`;
-
-            return (
-              <a
-                key={fight.id}
-                href={fightUrl}
-                style={{
-                  textDecoration: 'none',
-                  color: 'inherit',
-                }}
-                onClick={e => {
-                  // 只处理左键点击，右键/中键不拦截
-                  if (
-                    !e.ctrlKey &&
-                    !e.metaKey &&
-                    !e.shiftKey &&
-                    e.button === 0
-                  ) {
-                    e.preventDefault();
-                    handleFightClick(fight.id);
+    <div style={{ minHeight: '80vh' }}>
+      {/* 手机端返回按钮和当前战斗信息 - 只在小屏幕显示 */}
+      {isMobile && (
+        <div className="p-2" style={{ background: '#f8f9fa', borderBottom: '1px solid #ddd' }}>
+          <div className="d-flex align-items-center justify-content-between">
+            <button
+              className="btn btn-link text-decoration-none p-1"
+              onClick={() => navigate(`/${apiKey}`)}
+              style={{ fontSize: '1.5rem' }}
+              title="返回主页"
+            >
+              ⬅
+            </button>
+            <div className="flex-grow-1 mx-3">
+              {selectedFightId && logData && (
+                (() => {
+                  const selectedFight = logData.fights.find(f => f.id === parseInt(selectedFightId));
+                  if (selectedFight) {
+                    const duration = selectedFight.end_time && selectedFight.start_time
+                      ? Math.floor((selectedFight.end_time - selectedFight.start_time) / 1000)
+                      : 0;
+                    const minutes = Math.floor(duration / 60);
+                    const seconds = duration % 60;
+                    const formattedDuration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                    const textColor = selectedFight.kill ? 'text-success' : 'text-danger';
+                    
+                    return (
+                      <div className={`fw-bold ${textColor}`} style={{ fontSize: '0.9rem' }}>
+                        {selectedFight.name} ({selectedFight.id}) {formattedDuration}
+                      </div>
+                    );
                   }
-                }}
-              >
-                <div
-                  className="p-2"
-                  style={{
-                    cursor: 'pointer',
-                    backgroundColor: selectedFightId === fight.id.toString() ? '#b3e5fc' : 'transparent', // 蓝色底色
-                    fontWeight: selectedFightId === fight.id.toString() ? 'bold' : 'normal', // 加粗字体
-                    boxShadow: selectedFightId === fight.id.toString() ? '0px 4px 6px rgba(0, 0, 0, 0.1)' : 'none', // 浮雕效果
-                    borderRadius: selectedFightId === fight.id.toString() ? '4px' : '0', // 圆角
-                  }}
-                >
-                  <span className={textColor}>
-                    {fight.name} ({fight.id}) {formattedDuration}
-                  </span>
-                </div>
-              </a>
-            );
-          })
-        ) : (
-          <p className="p-3">加载中...</p>
-        )}
-      </div>
-      <div
-        ref={resizerRef}
-        style={{
-          width: '5px',
-          cursor: 'col-resize',
-          backgroundColor: '#ddd',
-        }}
-        onMouseDown={handleMouseDown}
-      ></div>
-      <div className="flex-grow-1 p-3" style={{ marginBottom: '30px' }}> {/* 使用 marginBottom 确保内容不会被页脚遮挡 */}
-        {error ? ( // 如果存在错误信息，显示错误提示
-          <p className="text-danger">{error}</p>
-        ) : selectedFightId ? (
-          loading || !logData ? (
-            <p>加载战斗数据中...</p>
-          ) : (
-            Object.keys(phaseData).length > 0 ? (
-              Object.entries(phaseData).map(([phaseName, { damageData, effectiveDuration }]) => (
-                <div key={phaseName} className="mb-4">
-                  <h5>
-                    {phaseName}
-                    {effectiveDuration > 0 && (
-                      <span
-                        className="text-muted ms-4"
-                        style={{ fontSize: '0.9rem' }}
-                      >
-                        {effectiveDuration.toFixed(2)}秒
+                  return null;
+                })()
+              )}
+            </div>
+            <button
+              className="btn btn-outline-primary btn-sm"
+              onClick={() => setFightListExpanded(!fightListExpanded)}
+              title={fightListExpanded ? "折叠战斗列表" : "展开战斗列表"}
+            >
+              {fightListExpanded ? "折叠" : "选择战斗"}
+            </button>
+          </div>
+          
+          {/* 折叠的战斗列表 */}
+          {fightListExpanded && (
+            <div className="mt-2" style={{ 
+              maxHeight: '300px', 
+              overflowY: 'auto',
+              border: '1px solid #ddd',
+              borderRadius: '4px',
+              background: 'white'
+            }}>
+              {logData ? (
+                logData.fights.map(fight => {
+                  const duration = fight.end_time && fight.start_time
+                    ? Math.floor((fight.end_time - fight.start_time) / 1000)
+                    : 0;
+                  const minutes = Math.floor(duration / 60);
+                  const seconds = duration % 60;
+                  const formattedDuration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                  const textColor = fight.kill ? 'text-success' : 'text-danger';
+
+                  return (
+                    <div
+                      key={fight.id}
+                      className="p-2"
+                      style={{
+                        cursor: 'pointer',
+                        backgroundColor: selectedFightId === fight.id.toString() ? '#b3e5fc' : 'transparent',
+                        borderBottom: '1px solid #eee'
+                      }}
+                      onClick={() => {
+                        handleFightClick(fight.id);
+                        setFightListExpanded(false); // 选择后自动折叠
+                      }}
+                    >
+                      <span className={textColor}>
+                        {fight.name} ({fight.id}) {formattedDuration}
                       </span>
-                    )}
-                    {phaseConfigItems[phaseName] && phaseConfigItems[phaseName].length > 0 && (
-                      <select
-                        className="form-select d-inline-block ms-3"
-                        style={{ width: 320, maxWidth: '100%', display: 'inline-block', verticalAlign: 'middle' }}
-                        value={
-                          phaseSelectedDataset[phaseName]
-                            ? phaseSelectedDataset[phaseName].datasetName
-                            : phaseConfigItems[phaseName][0].datasetName
-                        }
-                        disabled={phaseConfigItems[phaseName].length === 1}
-                        onChange={e => {
-                          const selected = phaseConfigItems[phaseName].find(
-                            item => item.datasetName === e.target.value
-                          );
-                          if (selected) handleDatasetChange(phaseName, selected);
-                        }}
-                      >
-                        {phaseConfigItems[phaseName].map(item => (
-                          <option key={item.datasetName} value={item.datasetName}>
-                            {item.datasetName} ({item.creationDate})
-                          </option>
-                        ))}
-                      </select>
-                    )}
-                  </h5>
-                  {damageData && damageData.players && damageData.players.length > 0 ? (
-                    <table className="table table-striped" style={{ fontFamily: 'Consolas' }}>
-                      <thead style={{ fontWeight: 'bold' }}>
-                        <tr>
-                          <th>玩家</th>
-                          <th>职业</th>
-                          <th>LOGS</th>
-                          <th>RDPS</th>
-                          <th>ADPS</th>
-                          <th>NDPS</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {damageData.players.map(player => (
-                          <tr key={player.id}>
-                            <td>{player.name}</td>
-                            <td>{player.jobNameCN}</td>
-                            <td style={{ color: getLogColor(player.predictLogs) }}>
-                              {player.predictLogs === undefined
-                                ? '--'
-                                : player.predictLogs < 0
-                                ? '0-'
-                                : player.predictLogs > 100
-                                ? '100+'
-                                : player.predictLogs.toFixed(0)}
-                            </td>
-                            <td>{player.totalRDPS.toFixed(2)}</td>
-                            <td>{player.totalADPS.toFixed(2)}</td>
-                            <td>{player.totalNDPS.toFixed(2)}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  ) : (
-                    <p>该阶段无玩家数据。</p>
-                  )}
-                </div>
-              ))
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="p-3">加载中...</div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 响应式容器 */}
+      <div className={isMobile ? "d-flex flex-column" : "d-flex"}>
+        {/* 侧边栏 - 在小屏幕上隐藏，大屏幕上显示在左侧 */}
+        {!isMobile && (
+          <div
+            className="sidebar"
+            style={{
+              width: `${sidebarWidth}px`,
+              minWidth: `${SIDEBAR_MIN_WIDTH}px`,
+              maxWidth: `${SIDEBAR_MAX_WIDTH}px`,
+              overflowY: 'auto',
+              borderRight: '1px solid #ddd',
+              flexShrink: 0 // 防止侧边栏被压缩
+            }}
+          >
+            <div className="d-flex align-items-center p-3">
+              <button
+                className="btn btn-link text-decoration-none"
+                onClick={() => navigate(`/${apiKey}`)}
+                style={{ fontSize: '1.5rem' }}
+                title="返回主页"
+              >
+                ⬅
+              </button>
+              <h4 className="ms-2 mb-0">战斗列表</h4>
+            </div>
+            {logData ? (
+              logData.fights.map(fight => {
+                const duration = fight.end_time && fight.start_time
+                  ? Math.floor((fight.end_time - fight.start_time) / 1000)
+                  : 0;
+                const minutes = Math.floor(duration / 60);
+                const seconds = duration % 60;
+                const formattedDuration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                const textColor = fight.kill ? 'text-success' : 'text-danger';
+                const fightUrl = `/fflogs_phase_ranker/#/${apiKey}/${logsId}/${fight.id}`;
+
+                return (
+                  <a
+                    key={fight.id}
+                    href={fightUrl}
+                    style={{
+                      textDecoration: 'none',
+                      color: 'inherit',
+                    }}
+                    onClick={e => {
+                      if (
+                        !e.ctrlKey &&
+                        !e.metaKey &&
+                        !e.shiftKey &&
+                        e.button === 0
+                      ) {
+                        e.preventDefault();
+                        handleFightClick(fight.id);
+                      }
+                    }}
+                  >
+                    <div
+                      className="p-2"
+                      style={{
+                        cursor: 'pointer',
+                        backgroundColor: selectedFightId === fight.id.toString() ? '#b3e5fc' : 'transparent',
+                        fontWeight: selectedFightId === fight.id.toString() ? 'bold' : 'normal',
+                        boxShadow: selectedFightId === fight.id.toString() ? '0px 4px 6px rgba(0, 0, 0, 0.1)' : 'none',
+                        borderRadius: selectedFightId === fight.id.toString() ? '4px' : '0',
+                      }}
+                    >
+                      <span className={textColor}>
+                        {fight.name} ({fight.id}) {formattedDuration}
+                      </span>
+                    </div>
+                  </a>
+                );
+              })
             ) : (
-              <p>该战斗无分P数据。</p>
-            )
-          )
-        ) : (
-          <p>请选择一场战斗以查看详细信息。</p>
+              <p className="p-3">加载中...</p>
+            )}
+          </div>
         )}
+
+        {/* 拖拽条 - 只在大屏幕上显示 */}
+        {!isMobile && (
+          <div
+            ref={resizerRef}
+            style={{
+              width: '5px',
+              cursor: 'col-resize',
+              backgroundColor: '#ddd',
+              flexShrink: 0 // 防止拖拽条被压缩
+            }}
+            onMouseDown={handleMouseDown}
+          ></div>
+        )}
+
+        {/* 主体内容 */}
+        <div className="flex-grow-1 p-3" style={{ marginBottom: '30px' }}>
+          {error ? ( // 如果存在错误信息，显示错误提示
+            <p className="text-danger">{error}</p>
+          ) : selectedFightId ? (
+            loading || !logData ? (
+              <p>加载战斗数据中...</p>
+            ) : (
+              Object.keys(phaseData).length > 0 ? (
+                Object.entries(phaseData).map(([phaseName, { damageData, effectiveDuration }]) => (
+                  <div key={phaseName} className="mb-4">
+                    <h5>
+                      {phaseName}
+                      {effectiveDuration > 0 && (
+                        <span
+                          className="text-muted ms-4"
+                          style={{ fontSize: '0.9rem' }}
+                        >
+                          {effectiveDuration.toFixed(2)}秒
+                        </span>
+                      )}
+                      {phaseConfigItems[phaseName] && phaseConfigItems[phaseName].length > 0 && (
+                        <select
+                          className="form-select d-inline-block ms-3"
+                          style={{ width: 320, maxWidth: '100%', display: 'inline-block', verticalAlign: 'middle' }}
+                          value={
+                            phaseSelectedDataset[phaseName]
+                              ? phaseSelectedDataset[phaseName].datasetName
+                              : phaseConfigItems[phaseName][0].datasetName
+                          }
+                          disabled={phaseConfigItems[phaseName].length === 1}
+                          onChange={e => {
+                            const selected = phaseConfigItems[phaseName].find(
+                              item => item.datasetName === e.target.value
+                            );
+                            if (selected) handleDatasetChange(phaseName, selected);
+                          }}
+                        >
+                          {phaseConfigItems[phaseName].map(item => (
+                            <option key={item.datasetName} value={item.datasetName}>
+                              {item.datasetName} ({item.creationDate})
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                    </h5>
+                    {damageData && damageData.players && damageData.players.length > 0 ? (
+                      <table className="table table-striped" style={{ fontFamily: 'Consolas' }}>
+                        <thead style={{ fontWeight: 'bold' }}>
+                          <tr>
+                            <th>玩家</th>
+                            <th>职业</th>
+                            <th>LOGS</th>
+                            <th>RDPS</th>
+                            <th>ADPS</th>
+                            <th>NDPS</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {damageData.players.map(player => (
+                            <tr key={player.id}>
+                              <td>{player.name}</td>
+                              <td>{player.jobNameCN}</td>
+                              <td style={{ color: getLogColor(player.predictLogs) }}>
+                                {player.predictLogs === undefined
+                                  ? '--'
+                                  : player.predictLogs < 0
+                                  ? '0-'
+                                  : player.predictLogs > 100
+                                  ? '100+'
+                                  : player.predictLogs.toFixed(0)}
+                              </td>
+                              <td>{player.totalRDPS.toFixed(2)}</td>
+                              <td>{player.totalADPS.toFixed(2)}</td>
+                              <td>{player.totalNDPS.toFixed(2)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    ) : (
+                      <p>该阶段无玩家数据。</p>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <p>该战斗无分P数据。</p>
+              )
+            )
+          ) : (
+            <p>请选择一场战斗以查看详细信息。</p>
+          )}
+        </div>
       </div>
     </div>
   );
