@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { CHANGELOG_DISPLAY_COUNT } from '../utils/constants';
 
 function InputPage() {
   const [input, setInput] = useState('');
   const [apiKey, setApiKey] = useState('');
   const [showHelp, setShowHelp] = useState(false);
+  const [changelog, setChangelog] = useState([]);
   const navigate = useNavigate();
   const { apiKey: routeApiKey } = useParams(); // 从路由参数中获取 apiKey
 
@@ -18,6 +20,37 @@ function InputPage() {
       localStorage.setItem('apiKey', routeApiKey);
     }
   }, [routeApiKey]);
+
+  useEffect(() => {
+    // 加载更新笔记
+    const loadChangelog = async () => {
+      try {
+        const response = await fetch(`${process.env.PUBLIC_URL}/data/changelog.json`);
+        const data = await response.json();
+        
+        // 按日期降序排序并只取前N条
+        const sortedUpdates = data.updates
+          .sort((a, b) => {
+            // 将日期格式 "25.8.4" 转换为可比较的格式
+            const dateA = new Date(`20${a.date.replace(/\./g, '/')}`);
+            const dateB = new Date(`20${b.date.replace(/\./g, '/')}`);
+            return dateB - dateA;
+          })
+          .slice(0, CHANGELOG_DISPLAY_COUNT);
+        setChangelog(sortedUpdates);
+      } catch (error) {
+        console.error('加载更新笔记失败:', error);
+        // 如果加载失败，显示一个默认的更新记录
+        setChangelog([{
+          date: "25.8.4",
+          version: "v0.6.0",
+          description: "适配手机端显示，修复部分链接无法读取的问题"
+        }]);
+      }
+    };
+
+    loadChangelog();
+  }, []);
 
   const handleApiKeyChange = (e) => {
     const newApiKey = e.target.value;
@@ -51,7 +84,7 @@ function InputPage() {
     }
 
     const sanitizedInput = finalInput.split('&')[0]; // 移除 & 及其后面的内容
-    const urlPattern = /^(?:https?:\/\/)?(?:[a-zA-Z0-9-]+\.)?fflogs\.com\/reports\/(a:[a-zA-Z0-9]+|[a-zA-Z0-9]+)(?:\?fight=([a-zA-Z0-9]+))?$|^[a-zA-Z0-9]{16,}$/;
+    const urlPattern = /^(?:https?:\/\/)?(?:[a-zA-Z0-9-]+\.)?fflogs\.com\/reports\/(a:[a-zA-Z0-9]+|[a-zA-Z0-9]+)(?:[?#]fight=([a-zA-Z0-9]+))?$|^[a-zA-Z0-9]{16,}$/;
     const match = sanitizedInput.match(urlPattern);
 
     if (match) {
@@ -134,6 +167,27 @@ function InputPage() {
         >
           浏览数据集
         </button>
+      </div>
+      {/* 更新笔记区域 */}
+      <div className="mb-4 p-3 mt-4 border rounded bg-light">
+        <h5 className="mb-3 fw-bold">更新笔记</h5>
+        <style>{`
+          .changelog-date { min-width: 60px; }
+          .changelog-version { min-width: 55px; }
+        `}</style>
+        <div className="small">
+          {changelog.length > 0 ? (
+            changelog.map((update, index) => (
+              <div key={index} className="mb-2 d-flex align-items-start">
+                <span className="badge bg-primary me-2 changelog-date">{update.date}</span>
+                <span className="badge bg-secondary me-3 changelog-version">{update.version}</span>
+                <span>{update.description}</span>
+              </div>
+            ))
+          ) : (
+            <div className="text-muted">加载中...</div>
+          )}
+        </div>
       </div>
     </div>
   );
