@@ -1,4 +1,5 @@
 [
-  { "version": "v71", "fileName": "config.json" },
-  { "version": "v72", "fileName": "config_glb.json" }
+  { "version": "v71", "fileNames": ["config.json"] },
+  { "version": "v72", "fileNames": ["config_glb.json"] }, 
+  { "version": "v725", "fileNames": ["config.json"] }
 ]
