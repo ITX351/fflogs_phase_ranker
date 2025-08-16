@@ -25,21 +25,29 @@ async function loadConfig(): Promise<ConfigItem[]> {
   if (!listResponse.ok) {
     throw new Error(`Failed to load config_file_list.json: ${listResponse.statusText}`);
   }
-  const configList: { version: string; fileName: string }[] = await listResponse.json();
+  // 修改为读取 fileNames 列表
+  const configList: { version: string; fileNames: string[] }[] = await listResponse.json();
   const allConfigs: ConfigItem[][] = await Promise.all(
     configList.map(async (item) => {
-      const filePath = pathPrefix + item.version + '/' + item.fileName;
-      const resp = await fetch(filePath);
-      if (!resp.ok) {
-        throw new Error(`Failed to load ${filePath}: ${resp.statusText}`);
-      }
-      const configs: ConfigItem[] = await resp.json();
-      configs.forEach(config => {
-        if (config.dataFileName && !config.dataFileName.startsWith(item.version + '/')) {
-          config.dataFileName = item.version + '/' + config.dataFileName;
-        }
-      });
-      return configs;
+      // 枚举所有 fileNames
+      const configsArr: ConfigItem[][] = await Promise.all(
+        item.fileNames.map(async (fileName) => {
+          const filePath = pathPrefix + item.version + '/' + fileName;
+          const resp = await fetch(filePath);
+          if (!resp.ok) {
+            throw new Error(`Failed to load ${filePath}: ${resp.statusText}`);
+          }
+          const configs: ConfigItem[] = await resp.json();
+          configs.forEach(config => {
+            if (config.dataFileName && !config.dataFileName.startsWith(item.version + '/')) {
+              config.dataFileName = item.version + '/' + config.dataFileName;
+            }
+          });
+          return configs;
+        })
+      );
+      // 合并所有 configs
+      return configsArr.flat();
     })
   );
   return allConfigs.flat();

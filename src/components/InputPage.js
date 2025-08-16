@@ -42,9 +42,9 @@ function InputPage() {
         console.error('加载更新笔记失败:', error);
         // 如果加载失败，显示一个默认的更新记录
         setChangelog([{
-          date: "25.8.4",
-          version: "v0.6.0",
-          description: "适配手机端显示，修复部分链接无法读取的问题"
+          date: "",
+          version: "",
+          description: "更新笔记加载失败"
         }]);
       }
     };
@@ -102,9 +102,25 @@ function InputPage() {
     return `${window.location.origin}/fflogs_phase_ranker/#/${apiKey}`;
   };
 
+  // 获取最新的版本号
+  const getLatestVersion = () => {
+    if (changelog.length > 0 && changelog[0].version) {
+      return changelog[0].version;
+    }
+    return null;
+  };
+
+  const latestVersion = getLatestVersion();
+
   return (
     <div className="container mt-5">
-      <h1 className="text-center">FFLogs 分P伤害排名查询工具</h1>
+      <h1 className="text-center">FFLogs 分P伤害排名查询工具
+        {latestVersion && (
+          <span className="badge bg-secondary ms-2" style={{ fontSize: '0.5em', verticalAlign: 'middle' }}>
+            {latestVersion}
+          </span>
+        )}
+      </h1>
       <form onSubmit={handleSubmit} className="mt-4">
         <div className="mb-3">
           <label htmlFor="logIdInput" className="form-label">请输入 FFLogs 链接或日志 ID：</label>
@@ -150,24 +166,28 @@ function InputPage() {
             </div>
           )}
         </div>
-        <button type="submit" className="btn btn-primary w-100">跳转</button>
+        <div className="row g-2">
+          <div className="col-7">
+            <button type="submit" className="btn btn-primary w-100">跳转</button>
+          </div>
+          <div className="col-5">
+            <button
+              type="button"
+              className="btn w-100"
+              style={{
+                backgroundColor: '#ffd700',
+                color: '#222',
+                fontWeight: 'bold',
+                border: '2px solid #ffb800',
+                boxShadow: '0 2px 8px rgba(255,215,0,0.15)',
+              }}
+              onClick={() => navigate('/dataset')}
+            >
+              浏览数据集
+            </button>
+          </div>
+        </div>
       </form>
-      <div className="mt-3 text-center">
-        <button
-          type="button"
-          className="btn"
-          style={{
-            backgroundColor: '#ffd700',
-            color: '#222',
-            fontWeight: 'bold',
-            border: '2px solid #ffb800',
-            boxShadow: '0 2px 8px rgba(255,215,0,0.15)'
-          }}
-          onClick={() => navigate('/dataset')}
-        >
-          浏览数据集
-        </button>
-      </div>
       {/* 更新笔记区域 */}
       <div className="mb-4 p-3 mt-4 border rounded bg-light">
         <h5 className="mb-3 fw-bold">更新笔记</h5>
@@ -187,6 +207,16 @@ function InputPage() {
           ) : (
             <div className="text-muted">加载中...</div>
           )}
+        </div>
+      </div>
+      {/* 致谢和作者信息 */}
+      <div className="mb-4 p-3 border rounded bg-light">
+        <h5 className="mb-3 fw-bold">致谢</h5>
+        <div className="small">
+          感谢<a href="https://space.bilibili.com/12348381" target="_blank" rel="noopener noreferrer">白忆寒_DreamWalker</a>、
+          <a href="https://space.bilibili.com/8900735" target="_blank" rel="noopener noreferrer">leifeng桑</a>的开发建议。
+          <br />
+          by <a href="https://space.bilibili.com/522021" target="_blank" rel="noopener noreferrer">ITX351</a>（王离@延夏）
         </div>
       </div>
     </div>

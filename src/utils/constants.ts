@@ -17,4 +17,4 @@ export const SIDEBAR_MAX_WIDTH: number = 600; // px - 侧边栏最大宽度
 /**
  * changelog展示条数
  */
-export const CHANGELOG_DISPLAY_COUNT: number = 10;
+export const CHANGELOG_DISPLAY_COUNT: number = 5;
