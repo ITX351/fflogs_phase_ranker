@@ -1,6 +1,11 @@
 {
   "updates": [
     {
+      "date": "25.8.16",
+      "version": "v0.6.1",
+      "description": "更新国服7.25数据集"
+    },
+    {
       "date": "25.8.4",
       "version": "v0.6.0",
       "description": "适配手机端显示，修复部分链接无法读取的问题"

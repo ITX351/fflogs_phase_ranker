@@ -24,8 +24,8 @@
 **使用方法：**
 1. 安装 [Tampermonkey](https://www.tampermonkey.net/) 浏览器插件。
 2. 将 `tampermonkey_fflogs_dataset.js` 脚本添加到 Tampermonkey。
-3. 访问 FFlogs 网站的绝境战-数据统计页面（`https://cn.fflogs.com/zone/statistics/*`，注意包括class=Any才包括所有职业），页面右上角会出现“批量爬取分段数据”按钮。
-4. 点击按钮，等待自动采集并下载数据集 CSV 文件。
+3. 访问 FFlogs 网站的绝境战-数据统计页面（`https://cn.fflogs.com/zone/statistics/*`，注意包括class=Any才包括所有职业），页面右上角会出现“导出dsr数据”等三个按钮。
+4. 在包括对应副本的页面下点击按钮，等待自动采集并下载数据集 CSV 文件。
 
 ---
 
@@ -78,5 +78,5 @@ npm run build
 
 ---
 
-感谢[leifeng桑](https://space.bilibili.com/8900735)的开发建议。  
+感谢[白忆寒_DreamWalker](https://space.bilibili.com/12348381)、[leifeng桑](https://space.bilibili.com/8900735)的开发建议。  
 by [ITX351](https://space.bilibili.com/522021)（王离@延夏）
