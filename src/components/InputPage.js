@@ -52,6 +52,7 @@ function InputPage() {
     loadChangelog();
   }, []);
 
+
   const handleApiKeyChange = (e) => {
     const newApiKey = e.target.value;
     setApiKey(newApiKey);
@@ -104,6 +105,9 @@ function InputPage() {
 
   // 获取最新的版本号
   const getLatestVersion = () => {
+    if (process.env.REACT_APP_VERSION) {
+      return process.env.REACT_APP_VERSION;
+    }
     if (changelog.length > 0 && changelog[0].version) {
       return changelog[0].version;
     }

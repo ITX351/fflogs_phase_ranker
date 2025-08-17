@@ -1,6 +1,7 @@
 {
+  "packageManager": "pnpm@10.14.0",
   "name": "fflogs_phase_ranker",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "private": true,
   "homepage": "https://itx351.github.io/fflogs_phase_ranker",
   "dependencies": {
@@ -12,10 +13,10 @@
     "bootstrap": "^5.3.3",
     "dotenv": "^16.4.7",
     "gh-pages": "^6.3.0",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
-    "react-router-dom": "6.26.2",
-    "react-scripts": "5.0.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.4.0",
+    "react-scripts": "^5.0.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
