@@ -14,21 +14,24 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
+
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
 
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: 22
-        registry-url: 'https://registry.npmjs.org/'
+        cache: 'pnpm'
 
     - name: Install dependencies
-      run: npm install --frozen-lockfile
+      run: pnpm install --frozen-lockfile
 
     - name: Build project
       run: |
         export REACT_APP_VERSION=$(node -p "require('./package.json').version")
-        npm run build
+        pnpm build
 
     - name: Deploy to GitHub Pages
       if: github.event_name == 'push'
