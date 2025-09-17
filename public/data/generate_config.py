@@ -39,8 +39,9 @@ RAID_INFOS = [
     ),
 ]
 
-VERSION = "7.25"
-SERVER = "国服"
+VERSION = "7.3"
+SERVER = "国际服"
+EXEC_DIR_PREFIX = "v73"
 
 def find_raid_info(en_name):
     for info in RAID_INFOS:
@@ -50,7 +51,7 @@ def find_raid_info(en_name):
 
 def main():
     config = []
-    for fname in os.listdir('.'):
+    for fname in os.listdir(EXEC_DIR_PREFIX):
         if fname.endswith('.csv'):
             m = re.match(r'([a-zA-Z]+)_p(\d+)_([0-9]{6})\.csv', fname)
             if not m:
@@ -82,7 +83,7 @@ def main():
                 item["upperCombatTime"] = raid.upper_time[phase_a]
             config.append(item)
     # 写入 config.json
-    with open("config.json", "w", encoding="utf-8") as f:
+    with open(os.path.join(EXEC_DIR_PREFIX, "config.json"), "w", encoding="utf-8") as f:
         json.dump(config, f, ensure_ascii=False, indent=4)
 
 if __name__ == "__main__":
