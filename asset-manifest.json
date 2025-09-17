@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/fflogs_phase_ranker/static/css/main.4ecc6cb8.css",
-    "main.js": "/fflogs_phase_ranker/static/js/main.2ffab816.js",
+    "main.js": "/fflogs_phase_ranker/static/js/main.29979b6c.js",
     "static/js/357.0580fb96.chunk.js": "/fflogs_phase_ranker/static/js/357.0580fb96.chunk.js",
     "index.html": "/fflogs_phase_ranker/index.html",
     "main.4ecc6cb8.css.map": "/fflogs_phase_ranker/static/css/main.4ecc6cb8.css.map",
-    "main.2ffab816.js.map": "/fflogs_phase_ranker/static/js/main.2ffab816.js.map",
+    "main.29979b6c.js.map": "/fflogs_phase_ranker/static/js/main.29979b6c.js.map",
     "357.0580fb96.chunk.js.map": "/fflogs_phase_ranker/static/js/357.0580fb96.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.4ecc6cb8.css",
-    "static/js/main.2ffab816.js"
+    "static/js/main.29979b6c.js"
   ]
 }
