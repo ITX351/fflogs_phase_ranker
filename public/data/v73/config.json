@@ -1,0 +1,178 @@
+[
+    {
+        "datasetName": "7.3国际服龙诗P1",
+        "creationDate": "2025-09-17",
+        "raidMatchNames": [
+            "Dragonsong's Reprise"
+        ],
+        "raidLogsPhase": 1,
+        "dataFileName": "dsr_p1_250917.csv"
+    },
+    {
+        "datasetName": "7.3国际服龙诗P2",
+        "creationDate": "2025-09-17",
+        "raidMatchNames": [
+            "Dragonsong's Reprise"
+        ],
+        "raidLogsPhase": 2,
+        "dataFileName": "dsr_p2_250917.csv",
+        "calculationMode": 1
+    },
+    {
+        "datasetName": "7.3国际服龙诗P3",
+        "creationDate": "2025-09-17",
+        "raidMatchNames": [
+            "Dragonsong's Reprise"
+        ],
+        "raidLogsPhase": 3,
+        "dataFileName": "dsr_p3_250917.csv"
+    },
+    {
+        "datasetName": "7.3国际服龙诗P4",
+        "creationDate": "2025-09-17",
+        "raidMatchNames": [
+            "Dragonsong's Reprise"
+        ],
+        "raidLogsPhase": 4,
+        "dataFileName": "dsr_p4_250917.csv"
+    },
+    {
+        "datasetName": "7.3国际服龙诗P4.5",
+        "creationDate": "2025-09-17",
+        "raidMatchNames": [
+            "Dragonsong's Reprise"
+        ],
+        "raidLogsPhase": 5,
+        "dataFileName": "dsr_p5_250917.csv"
+    },
+    {
+        "datasetName": "7.3国际服龙诗P5",
+        "creationDate": "2025-09-17",
+        "raidMatchNames": [
+            "Dragonsong's Reprise"
+        ],
+        "raidLogsPhase": 6,
+        "dataFileName": "dsr_p6_250917.csv"
+    },
+    {
+        "datasetName": "7.3国际服龙诗P6",
+        "creationDate": "2025-09-17",
+        "raidMatchNames": [
+            "Dragonsong's Reprise"
+        ],
+        "raidLogsPhase": 7,
+        "dataFileName": "dsr_p7_250917.csv"
+    },
+    {
+        "datasetName": "7.3国际服龙诗P7",
+        "creationDate": "2025-09-17",
+        "raidMatchNames": [
+            "Dragonsong's Reprise"
+        ],
+        "raidLogsPhase": 8,
+        "dataFileName": "dsr_p8_250917.csv"
+    },
+    {
+        "datasetName": "7.3国际服伊甸P1",
+        "creationDate": "2025-09-17",
+        "raidMatchNames": [
+            "Futures Rewritten"
+        ],
+        "raidLogsPhase": 1,
+        "dataFileName": "eden_p1_250917.csv",
+        "calculationMode": 1
+    },
+    {
+        "datasetName": "7.3国际服伊甸P2",
+        "creationDate": "2025-09-17",
+        "raidMatchNames": [
+            "Futures Rewritten"
+        ],
+        "raidLogsPhase": 2,
+        "dataFileName": "eden_p2_250917.csv"
+    },
+    {
+        "datasetName": "7.3国际服伊甸P3",
+        "creationDate": "2025-09-17",
+        "raidMatchNames": [
+            "Futures Rewritten"
+        ],
+        "raidLogsPhase": 3,
+        "dataFileName": "eden_p3_250917.csv"
+    },
+    {
+        "datasetName": "7.3国际服伊甸P4",
+        "creationDate": "2025-09-17",
+        "raidMatchNames": [
+            "Futures Rewritten"
+        ],
+        "raidLogsPhase": 4,
+        "dataFileName": "eden_p4_250917.csv"
+    },
+    {
+        "datasetName": "7.3国际服伊甸P5",
+        "creationDate": "2025-09-17",
+        "raidMatchNames": [
+            "Futures Rewritten"
+        ],
+        "raidLogsPhase": 5,
+        "dataFileName": "eden_p5_250917.csv",
+        "upperCombatTime": 273000
+    },
+    {
+        "datasetName": "7.3国际服欧米茄P1",
+        "creationDate": "2025-09-17",
+        "raidMatchNames": [
+            "The Omega Protocol"
+        ],
+        "raidLogsPhase": 1,
+        "dataFileName": "omega_p1_250917.csv",
+        "calculationMode": 1
+    },
+    {
+        "datasetName": "7.3国际服欧米茄P2",
+        "creationDate": "2025-09-17",
+        "raidMatchNames": [
+            "The Omega Protocol"
+        ],
+        "raidLogsPhase": 2,
+        "dataFileName": "omega_p2_250917.csv"
+    },
+    {
+        "datasetName": "7.3国际服欧米茄P3",
+        "creationDate": "2025-09-17",
+        "raidMatchNames": [
+            "The Omega Protocol"
+        ],
+        "raidLogsPhase": 3,
+        "dataFileName": "omega_p3_250917.csv"
+    },
+    {
+        "datasetName": "7.3国际服欧米茄P4",
+        "creationDate": "2025-09-17",
+        "raidMatchNames": [
+            "The Omega Protocol"
+        ],
+        "raidLogsPhase": 4,
+        "dataFileName": "omega_p4_250917.csv"
+    },
+    {
+        "datasetName": "7.3国际服欧米茄P5",
+        "creationDate": "2025-09-17",
+        "raidMatchNames": [
+            "The Omega Protocol"
+        ],
+        "raidLogsPhase": 5,
+        "dataFileName": "omega_p5_250917.csv"
+    },
+    {
+        "datasetName": "7.3国际服欧米茄P6",
+        "creationDate": "2025-09-17",
+        "raidMatchNames": [
+            "The Omega Protocol"
+        ],
+        "raidLogsPhase": 6,
+        "dataFileName": "omega_p6_250917.csv",
+        "upperCombatTime": 268200
+    }
+]

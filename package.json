@@ -1,7 +1,7 @@
 {
   "packageManager": "pnpm@10.14.0",
   "name": "fflogs_phase_ranker",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "private": true,
   "homepage": "https://itx351.github.io/fflogs_phase_ranker",
   "dependencies": {

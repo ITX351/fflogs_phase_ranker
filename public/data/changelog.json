@@ -1,6 +1,11 @@
 {
   "updates": [
     {
+      "date": "25.9.17",
+      "version": "v0.6.3",
+      "description": "更新国际服7.3数据集"
+    },
+    {
       "date": "25.8.16",
       "version": "v0.6.1",
       "description": "更新国服7.25数据集"
@@ -23,7 +28,7 @@
     {
       "date": "25.5.13",
       "version": "v0.4.2",
-      "description": "修复logs网站json输出变更导致无法正确识别上天时间的问题"
+      "description": "修复logs网站输出变更导致无法正确识别上天时间的问题"
     },
     {
       "date": "25.5.8",
