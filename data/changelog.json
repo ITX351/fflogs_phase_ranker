@@ -1,6 +1,11 @@
 {
   "updates": [
     {
+      "date": "25.11.4",
+      "version": "v0.6.4",
+      "description": "更新国服7.38数据集"
+    },
+    {
       "date": "25.9.17",
       "version": "v0.6.3",
       "description": "更新国际服7.3数据集"
