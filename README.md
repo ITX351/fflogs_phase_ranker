@@ -49,25 +49,29 @@
 
 ### 服务器 React.js 配置
 
+#### 关于 pnpm
+
+本项目使用 [pnpm](https://pnpm.io/) 作为包管理工具。可通过 `npm install -g pnpm` 安装。
+
 #### Setup
 
 运行以下命令以安装所有依赖项：
 ```sh
-npm install
+pnpm install
 ```
 
 #### Running
 
 运行以下命令并访问 `localhost:3000` 进行调试：
 ```sh
-npm start
+pnpm start
 ```
 
 #### Release
 
 运行以下命令以生成最小化的生产版本：
 ```sh
-npm run build
+pnpm build
 ```
 
 ---
