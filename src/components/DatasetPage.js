@@ -256,7 +256,7 @@ function DatasetPage() {
                 ))}
               </select>
             ) : (
-              <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+              <div style={{ overflowY: 'auto' }}>
                 {datasets.map(ds => (
                   <div
                     key={ds.datasetName}
