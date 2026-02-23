@@ -3,5 +3,7 @@
   { "version": "v72", "fileNames": ["config_glb.json"] },
   { "version": "v725", "fileNames": ["config.json"] },
   { "version": "v73", "fileNames": ["config.json"] },
-  { "version": "v738", "fileNames": ["config.json"] }
+  { "version": "v738", "fileNames": ["config.json"] },
+  { "version": "v741z", "fileNames": ["config.json"] },
+  { "version": "v741j", "fileNames": ["config.json"] }
 ]
