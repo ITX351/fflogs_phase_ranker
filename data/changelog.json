@@ -1,6 +1,11 @@
 {
   "updates": [
     {
+      "date": "26.3.31",
+      "version": "v0.6.6",
+      "description": "更新国服、国际服7.45数据集"
+    },
+    {
       "date": "26.2.3",
       "version": "v0.6.5",
       "description": "更新国服、国际服7.41数据集"
