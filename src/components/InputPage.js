@@ -7,6 +7,7 @@ function InputPage() {
   const [apiKey, setApiKey] = useState('');
   const [showHelp, setShowHelp] = useState(false);
   const [changelog, setChangelog] = useState([]);
+  const [showAllChangelog, setShowAllChangelog] = useState(false);
   const navigate = useNavigate();
   const { apiKey: routeApiKey } = useParams(); // 从路由参数中获取 apiKey
 
@@ -28,15 +29,14 @@ function InputPage() {
         const response = await fetch(`${process.env.PUBLIC_URL}/data/changelog.json`);
         const data = await response.json();
         
-        // 按日期降序排序并只取前N条
+        // 按日期降序排序
         const sortedUpdates = data.updates
           .sort((a, b) => {
             // 将日期格式 "25.8.4" 转换为可比较的格式
             const dateA = new Date(`20${a.date.replace(/\./g, '/')}`);
             const dateB = new Date(`20${b.date.replace(/\./g, '/')}`);
             return dateB - dateA;
-          })
-          .slice(0, CHANGELOG_DISPLAY_COUNT);
+          });
         setChangelog(sortedUpdates);
       } catch (error) {
         console.error('加载更新笔记失败:', error);
@@ -115,6 +115,10 @@ function InputPage() {
   };
 
   const latestVersion = getLatestVersion();
+  const visibleChangelog = showAllChangelog
+    ? changelog
+    : changelog.slice(0, CHANGELOG_DISPLAY_COUNT);
+  const hasMoreChangelog = changelog.length > CHANGELOG_DISPLAY_COUNT;
 
   return (
     <div className="container mt-5">
@@ -201,13 +205,26 @@ function InputPage() {
         `}</style>
         <div className="small">
           {changelog.length > 0 ? (
-            changelog.map((update, index) => (
-              <div key={index} className="mb-2 d-flex align-items-start">
-                <span className="badge bg-primary me-2 changelog-date">{update.date}</span>
-                <span className="badge bg-secondary me-3 changelog-version">{update.version}</span>
-                <span>{update.description}</span>
-              </div>
-            ))
+            <>
+              {visibleChangelog.map((update, index) => (
+                <div key={index} className="mb-2 d-flex align-items-start">
+                  <span className="badge bg-primary me-2 changelog-date">{update.date}</span>
+                  <span className="badge bg-secondary me-3 changelog-version">{update.version}</span>
+                  <span>{update.description}</span>
+                </div>
+              ))}
+              {hasMoreChangelog && (
+                <div className="text-end mt-3">
+                  <button
+                    type="button"
+                    className="btn btn-outline-secondary btn-sm"
+                    onClick={() => setShowAllChangelog(!showAllChangelog)}
+                  >
+                    {showAllChangelog ? '收起更新笔记' : '展开全部更新笔记'}
+                  </button>
+                </div>
+              )}
+            </>
           ) : (
             <div className="text-muted">加载中...</div>
           )}
