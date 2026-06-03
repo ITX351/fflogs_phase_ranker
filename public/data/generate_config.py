@@ -39,9 +39,9 @@ RAID_INFOS = [
     ),
 ]
 
-VERSION = "7.45"
-SERVER = "国服"
-EXEC_DIR_PREFIX = "v745z"
+VERSION = "7.5"
+SERVER = "国际服"
+EXEC_DIR_PREFIX = "v750j"
 
 def find_raid_info(en_name):
     for info in RAID_INFOS:

@@ -7,5 +7,7 @@
   { "version": "v741z", "fileNames": ["config.json"] },
   { "version": "v741j", "fileNames": ["config.json"] },
   { "version": "v745z", "fileNames": ["config.json"] },
-  { "version": "v745j", "fileNames": ["config.json"] }
+  { "version": "v745j", "fileNames": ["config.json"] },
+  { "version": "v750z", "fileNames": ["config.json"] },
+  { "version": "v750j", "fileNames": ["config.json"] }
 ]
