@@ -1,6 +1,11 @@
 {
   "updates": [
     {
+      "date": "26.6.3",
+      "version": "v0.6.7",
+      "description": "更新国服、国际服7.5数据集（不包括绝妖星）"
+    },
+    {
       "date": "26.3.31",
       "version": "v0.6.6",
       "description": "更新国服、国际服7.45数据集"
