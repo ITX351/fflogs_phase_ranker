@@ -37,11 +37,22 @@ RAID_INFOS = [
         phase_remap={},
         upper_time={5: 273000}
     ),
+    RaidInfo(
+        cn_name="妖星",
+        en_name="kafka",
+        en_match="Dancing Mad",
+        calc_mode_list=[1], # P1的Rdps计算采取特殊时长，可能是fflogs API的bug
+        phase_remap={},
+        upper_time={}
+    ),
 ]
 
-VERSION = "7.5"
-SERVER = "国际服"
-EXEC_DIR_PREFIX = "v750j"
+VERSION = "7.51"
+CONFIGS = [
+    ("国服", "v751z"),
+    ("国际服", "v751j"),
+]
+DATA_DIR_PREFIX = os.path.join("public", "data")
 
 def find_raid_info(en_name):
     for info in RAID_INFOS:
@@ -50,41 +61,38 @@ def find_raid_info(en_name):
     return None
 
 def main():
-    config = []
-    for fname in os.listdir(EXEC_DIR_PREFIX):
-        if fname.endswith('.csv'):
-            m = re.match(r'([a-zA-Z]+)_p(\d+)_([0-9]{6})\.csv', fname)
-            if not m:
-                continue
-            en_name, phase_a, yymmdd = m.group(1), int(m.group(2)), m.group(3)
-            raid = find_raid_info(en_name)
-            if not raid:
-                continue
-            # 分P重映射
-            phase_b = raid.phase_remap.get(phase_a, phase_a)
-            dataset_name = f"{VERSION}{SERVER}{raid.cn_name}P{phase_b}"
-            # 日期格式转换 YYMMDD -> YYYY-MM-DD
-            year = int(yymmdd[:2])
-            if year < 50:
-                year += 2000
-            else:
-                year += 1900
-            creation_date = f"{year:04d}-{yymmdd[2:4]}-{yymmdd[4:6]}"
-            item = {
-                "datasetName": dataset_name,
-                "creationDate": creation_date,
-                "raidMatchNames": [raid.en_match],
-                "raidLogsPhase": phase_a,
-                "dataFileName": fname
-            }
-            if phase_a in raid.calc_mode_list:
-                item["calculationMode"] = 1
-            if phase_a in raid.upper_time:
-                item["upperCombatTime"] = raid.upper_time[phase_a]
-            config.append(item)
-    # 写入 config.json
-    with open(os.path.join(EXEC_DIR_PREFIX, "config.json"), "w", encoding="utf-8") as f:
-        json.dump(config, f, ensure_ascii=False, indent=4)
+    for server, exec_dir_prefix in CONFIGS:
+        config = []
+        exec_dir = os.path.join(DATA_DIR_PREFIX, exec_dir_prefix)
+        for fname in os.listdir(exec_dir):
+            if fname.endswith('.csv'):
+                m = re.match(r'([a-zA-Z]+)_p(\d+)_([0-9]{8})\.csv', fname)
+                if not m:
+                    continue
+                en_name, phase_a, date_part = m.group(1), int(m.group(2)), m.group(3)
+                raid = find_raid_info(en_name)
+                if not raid:
+                    continue
+                # 分P重映射
+                phase_b = raid.phase_remap.get(phase_a, phase_a)
+                dataset_name = f"{VERSION}{server}{raid.cn_name}P{phase_b}"
+                # 日期格式转换 YYYYMMDD -> YYYY-MM-DD
+                creation_date = f"{date_part[:4]}-{date_part[4:6]}-{date_part[6:8]}"
+                item = {
+                    "datasetName": dataset_name,
+                    "creationDate": creation_date,
+                    "raidMatchNames": [raid.en_match],
+                    "raidLogsPhase": phase_a,
+                    "dataFileName": fname
+                }
+                if phase_a in raid.calc_mode_list:
+                    item["calculationMode"] = 1
+                if phase_a in raid.upper_time:
+                    item["upperCombatTime"] = raid.upper_time[phase_a]
+                config.append(item)
+        # 写入 config.json
+        with open(os.path.join(exec_dir, "config.json"), "w", encoding="utf-8") as f:
+            json.dump(config, f, ensure_ascii=False, indent=4)
 
 if __name__ == "__main__":
     main()

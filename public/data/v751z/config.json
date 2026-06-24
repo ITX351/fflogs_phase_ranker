@@ -1,0 +1,48 @@
+[
+    {
+        "datasetName": "7.51国服妖星P1",
+        "creationDate": "2026-06-24",
+        "raidMatchNames": [
+            "Dancing Mad"
+        ],
+        "raidLogsPhase": 1,
+        "dataFileName": "kafka_p1_20260624.csv",
+        "calculationMode": 1
+    },
+    {
+        "datasetName": "7.51国服妖星P2",
+        "creationDate": "2026-06-24",
+        "raidMatchNames": [
+            "Dancing Mad"
+        ],
+        "raidLogsPhase": 2,
+        "dataFileName": "kafka_p2_20260624.csv"
+    },
+    {
+        "datasetName": "7.51国服妖星P3",
+        "creationDate": "2026-06-24",
+        "raidMatchNames": [
+            "Dancing Mad"
+        ],
+        "raidLogsPhase": 3,
+        "dataFileName": "kafka_p3_20260624.csv"
+    },
+    {
+        "datasetName": "7.51国服妖星P4",
+        "creationDate": "2026-06-24",
+        "raidMatchNames": [
+            "Dancing Mad"
+        ],
+        "raidLogsPhase": 4,
+        "dataFileName": "kafka_p4_20260624.csv"
+    },
+    {
+        "datasetName": "7.51国服妖星P5",
+        "creationDate": "2026-06-24",
+        "raidMatchNames": [
+            "Dancing Mad"
+        ],
+        "raidLogsPhase": 5,
+        "dataFileName": "kafka_p5_20260624.csv"
+    }
+]

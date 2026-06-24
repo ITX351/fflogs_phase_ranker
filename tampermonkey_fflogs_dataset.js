@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         FFLogs Dataset Batch Fetcher
 // @namespace    http://tampermonkey.net/
-// @version      0.3
+// @version      0.4
 // @description  自动批量爬取FFLogs各分段数据并导出为CSV
 // @author       ITX351
 // @match        https://*.fflogs.com/zone/statistics/*
@@ -15,8 +15,26 @@
     const BOSS_DICT = {
         1076: 'dsr',
         1077: 'omega',
-        1079: 'eden'
+        1079: 'eden',
+        1085: 'kafka'
     };
+    const SEGMENT_RETRY_LIMIT = 3;
+    const SEGMENT_RETRY_DELAY = 1500;
+
+    function assertClassAny() {
+        const url = new URL(window.location.href);
+        if (url.searchParams.get('class') !== 'Any') {
+            throw new Error('当前URL不包含 class=Any，请切换到 Any 职业筛选后再运行脚本');
+        }
+    }
+
+    function getErrorMessage(error) {
+        return error instanceof Error ? error.message : String(error);
+    }
+
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
     // 工具函数：等待元素出现
     function waitForSelector(selector, timeout = 15000) {
@@ -72,6 +90,32 @@
         return result;
     }
 
+    async function collectSegmentData(link, segKey) {
+        let lastError = null;
+        for (let attempt = 1; attempt <= SEGMENT_RETRY_LIMIT; attempt++) {
+            try {
+                link.click();
+                await sleep(300);
+                await waitForLoadingDone();
+                await sleep(600);
+
+                const tableObj = parseTableEn();
+                if (Object.keys(tableObj).length === 0) {
+                    throw new Error('未获取到职业数据');
+                }
+                return tableObj;
+            } catch (error) {
+                lastError = error;
+                console.warn(`分段 ${segKey} 第 ${attempt}/${SEGMENT_RETRY_LIMIT} 次读取失败:`, error);
+                if (attempt < SEGMENT_RETRY_LIMIT) {
+                    await sleep(SEGMENT_RETRY_DELAY);
+                }
+            }
+        }
+
+        throw new Error(`分段 ${segKey} 读取失败，已重试 ${SEGMENT_RETRY_LIMIT} 次：${getErrorMessage(lastError)}`);
+    }
+
     // 核心数据采集函数
     async function collectBossPhaseData() {
         // 1. 获取所有分段按钮
@@ -80,8 +124,7 @@
         const links = Array.from(container.querySelectorAll('a.filter-item'))
             .filter(a => a.id && a.id.startsWith('metric-dataset-') && a.id !== 'metric-dataset-1000');
         if (links.length === 0) {
-            alert('未找到分段按钮');
-            return;
+            throw new Error('未找到分段按钮');
         }
 
         // 采集分段英文名（100,99,...,0）和显示名
@@ -99,17 +142,9 @@
         for (let i = 0; i < links.length; ++i) {
             const link = links[i];
             const segKey = segKeys[i];
-            link.click();
-
-            try {
-                await waitForLoadingDone();
-            } catch (e) {
-                console.warn('加载超时，跳过', segKey);
-                continue;
-            }
 
             // 解析表格
-            const tableObj = parseTableEn();
+            const tableObj = await collectSegmentData(link, segKey);
             if (!allJobs) {
                 allJobs = Object.keys(tableObj);
             }
@@ -118,7 +153,10 @@
                 if (!jobData[job]) jobData[job] = {};
                 jobData[job][segKey] = tableObj[job];
             }
-            await new Promise(r => setTimeout(r, 600));
+        }
+
+        if (!allJobs || allJobs.length === 0) {
+            throw new Error('未获取到任何职业数据');
         }
 
         // 生成CSV
@@ -152,9 +190,9 @@
         const a = document.createElement('a');
         a.href = url;
         
-        // 生成文件名，格式为 boss名_pX_YYMMDD.csv
+        // 生成文件名，格式为 boss名_pX_YYYYMMDD.csv
         const now = new Date();
-        const year = String(now.getFullYear()).slice(-2);
+        const year = String(now.getFullYear());
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const day = String(now.getDate()).padStart(2, '0');
         const filename = `${bossName}_p${phase}_${year}${month}${day}.csv`;
@@ -170,6 +208,7 @@
 
     // 处理单个Boss的所有分P
     async function processBoss(bossId, bossName) {
+        assertClassAny();
         console.log(`开始处理Boss ${bossName} (ID: ${bossId})`);
         
         // 查找该Boss的所有分P链接
@@ -191,9 +230,7 @@
         
         // 如果未找到任何分P，说明当前页面可能不存在指定副本
         if (phaseLinks.length === 0) {
-            console.error(`未找到Boss ${bossName} (ID: ${bossId}) 的任何分P，请确认当前页面是否为正确的副本统计页面。`);
-            alert(`未找到Boss ${bossName} 的任何分P，请确认当前页面是否为正确的副本统计页面。`);
-            return;
+            throw new Error(`未找到Boss ${bossName} (ID: ${bossId}) 的任何分P，请确认当前页面是否为正确的副本统计页面。`);
         }
         
         console.log(`找到 ${phaseLinks.length} 个分P`);
@@ -202,13 +239,13 @@
         for (const {phase, element} of phaseLinks) {
             console.log(`正在处理 ${bossName} P${phase}`);
             
-            // 触发点击事件
-            element.click();
-            
-            // 等待必要的元素加载
             try {
+                // 触发点击事件
+                element.click();
+                
+                // 等待必要的元素加载
                 await waitForSelector('#filter-dataset-selection-container ul', 15000);
-                await new Promise(resolve => setTimeout(resolve, 2000)); // 额外等待确保数据加载
+                await sleep(2000); // 额外等待确保数据加载
                 
                 // 采集数据
                 const csvContent = await collectBossPhaseData();
@@ -219,11 +256,9 @@
                 console.log(`${bossName} P${phase} 数据已导出`);
                 
                 // 等待一段时间再处理下一个分P
-                await new Promise(resolve => setTimeout(resolve, 3000));
+                await sleep(3000);
             } catch (error) {
-                console.error(`处理 ${bossName} P${phase} 时出错:`, error);
-                // 继续处理下一个分P
-                await new Promise(resolve => setTimeout(resolve, 3000));
+                throw new Error(`处理 ${bossName} P${phase} 时停止：${getErrorMessage(error)}`);
             }
         }
         
@@ -265,7 +300,7 @@
                 processBoss(bossId, bossName)
                     .catch(error => {
                         console.error('处理Boss时出错:', error);
-                        alert('处理过程中出现错误，请查看控制台');
+                        alert(`处理过程中止：${getErrorMessage(error)}`);
                     })
                     .finally(() => {
                         // 重新启用按钮
