@@ -49,8 +49,8 @@ RAID_INFOS = [
 
 VERSION = "7.51"
 CONFIGS = [
-    ("国服", "v751z"),
-    ("国际服", "v751j"),
+    ("国服", "v751z2", "v2"),
+    ("国际服", "v751j2", "v2"),
 ]
 DATA_DIR_PREFIX = os.path.join("public", "data")
 
@@ -61,7 +61,7 @@ def find_raid_info(en_name):
     return None
 
 def main():
-    for server, exec_dir_prefix in CONFIGS:
+    for server, exec_dir_prefix, version_suffix in CONFIGS:
         config = []
         exec_dir = os.path.join(DATA_DIR_PREFIX, exec_dir_prefix)
         for fname in os.listdir(exec_dir):
@@ -75,7 +75,7 @@ def main():
                     continue
                 # 分P重映射
                 phase_b = raid.phase_remap.get(phase_a, phase_a)
-                dataset_name = f"{VERSION}{server}{raid.cn_name}P{phase_b}"
+                dataset_name = f"{VERSION}{server}{raid.cn_name}P{phase_b}{f' {version_suffix}' if version_suffix else ''}"
                 # 日期格式转换 YYYYMMDD -> YYYY-MM-DD
                 creation_date = f"{date_part[:4]}-{date_part[4:6]}-{date_part[6:8]}"
                 item = {

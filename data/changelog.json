@@ -1,9 +1,14 @@
 {
   "updates": [
     {
+      "date": "26.7.4",
+      "version": "v0.7.1",
+      "description": "临时更新7.51数据集"
+    },
+    {
       "date": "26.6.24",
       "version": "v0.7.0",
-      "description": "更新国服、国际服7.51绝妖星数据集"
+      "description": "支持副本增加：7.51妖星乱舞绝境战"
     },
     {
       "date": "26.6.3",
