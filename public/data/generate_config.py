@@ -47,10 +47,10 @@ RAID_INFOS = [
     ),
 ]
 
-VERSION = "7.51"
+VERSION = "7.56"
 CONFIGS = [
-    ("国服", "v751z2", "v2"),
-    ("国际服", "v751j2", "v2"),
+    ("国服", "v756z", ""),
+    # ("国际服", "v751j2", "v2"),
 ]
 DATA_DIR_PREFIX = os.path.join("public", "data")
 

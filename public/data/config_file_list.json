@@ -11,5 +11,6 @@
   { "version": "v750z", "fileNames": ["config.json"] },
   { "version": "v750j", "fileNames": ["config.json"] },
   { "version": "v751z2", "fileNames": ["config.json"] },
-  { "version": "v751j2", "fileNames": ["config.json"] }
+  { "version": "v751j2", "fileNames": ["config.json"] },
+  { "version": "v756z", "fileNames": ["config.json"] }
 ]
